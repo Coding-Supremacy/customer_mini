@@ -3,7 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-고객 copy.ipynb
+
+.ipynb
+
 
 # C extensions
 *.so
