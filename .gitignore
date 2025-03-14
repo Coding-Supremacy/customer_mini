@@ -4,7 +4,12 @@ __pycache__/
 *$py.class
 
 
+<<<<<<< HEAD
 .ipynb
+.csv
+=======
+
+>>>>>>> 831f73e5e5c715e21817b1986d6010d1a3bccfce
 
 
 # C extensions
@@ -176,3 +181,4 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+filtered_customers.csv
