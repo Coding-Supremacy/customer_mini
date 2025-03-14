@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import joblib
 from datetime import datetime
+import re
+from num2words import num2words
 
 # 클러스터 ID에 대한 설명
 cluster_description = {
@@ -36,6 +37,12 @@ launch_dates = {
     'G90 (RS4)': '2022-03'
 }
 
+# 숫자를 한글로 변환하는 함수 (천 단위 포맷 처리)
+def number_to_korean(num):
+    if num == 0:
+        return "0 원"  # 0일 경우 처리
+    return num2words(num, to='currency', lang='ko')
+
 def run_input_customer_info():    
 
     # 고객 개인정보 입력.
@@ -56,18 +63,33 @@ def run_input_customer_info():
     아이디 = st.text_input("아이디 입력", key="id_input")
     가입일 = st.date_input("가입일 입력", min_value=datetime(1900, 1, 1), max_value=datetime.today(), key="registration_date_input")
 
-    # 생년월일 넣으면 연령 계산
-    생년월일 = st.date_input("생년월일 입력", min_value=datetime(1900, 1, 1), max_value=datetime.today(), key="dob_input")
+
+    # 현재 날짜에서 20년 전의 날짜를 구하기
+    today = datetime.today()
+    year_20_years_ago = today.replace(year=today.year - 20)
+
+    # 만약 오늘이 2월 29일이라면, 20년 전 날짜가 존재하지 않을 수 있기 때문에, 월과 일을 조정합니다.
+    if year_20_years_ago.month == 2 and year_20_years_ago.day == 29:
+        year_20_years_ago = year_20_years_ago.replace(day=28)
+
+    # 생년월일 입력 (1900년부터 20년 전 날짜까지 선택 가능)
+    생년월일 = st.date_input("생년월일 입력", min_value=datetime(1900, 1, 1), max_value=year_20_years_ago, key="dob_input")
     if 생년월일:
         today = datetime.today()
         나이 = today.year - 생년월일.year - ((today.month, today.day) < (생년월일.month, 생년월일.day))
         st.write(f"계산된 나이: {나이}세")
 
-    거래금액 = st.number_input("거래 금액 입력", min_value=0, step=10000, key="transaction_amount_input")
+    # 거래금액 입력 (천 단위로 입력받기)
+    거래금액 = st.number_input("거래 금액 입력", min_value=0, step=1000000, key="transaction_amount_input")
+    
+    # 입력한 거래금액을 천 단위로 표시
+    거래금액_한글 = number_to_korean(int(거래금액))
+    st.write(f"입력하신 금액: {거래금액_한글}")
+
     구매빈도 = st.number_input("제품 구매 빈도 입력", min_value=0, step=1, key="purchase_frequency_input")
     차량구분 = st.selectbox("차량 구분 선택", ["준중형 세단", "중형 세단", "대형 세단", "SUV", "픽업트럭"], key="vehicle_type_select")
     거래방식 = st.selectbox("거래 방식 선택", ["카드", "현금", "계좌이체"], key="transaction_method_select")
-    구매경로 = st.selectbox("구매 경로 선택", ["온라인","오프라인"], key="purchase_path_select")
+    구매경로 = st.selectbox("구매 경로 선택", ["온라인", "오프라인"], key="purchase_path_select")
 
     # 구매한 제품 선택
     구매한제품 = st.selectbox("구입 모델 선택", list(launch_dates.keys()), key="purchased_product_select")
@@ -79,12 +101,24 @@ def run_input_customer_info():
     if 제품출시년월:
         st.write(f"선택하신 모델의 출시 년월: {제품출시년월}")
 
-    # 입력값을 데이터프레임으로 변환
+    # 휴대폰 번호 정리 (하이픈(-) 제거 및 11자 검사)
+    휴대폰번호 = re.sub(r'[^0-9]', '', 휴대폰번호)  # 하이픈 제거
+    if len(휴대폰번호) != 11:
+        st.error("휴대폰 번호는 11자리 숫자여야 합니다.")
+        return  # 에러 발생 시 진행하지 않도록 return
+
+    # 이메일 검사 (@ 포함 여부 확인)
+    if '@' not in 이메일:
+        st.error("이메일에 '@' 문자가 포함되어야 합니다.")
+        return  # 에러 발생 시 진행하지 않도록 return
+
+    # 모델에 맞는 컬럼만 사용하여 입력 데이터 준비
     if st.button("예측하기"):
-        input_data = pd.DataFrame([[이름, 생년월일, 성별, 휴대폰번호, 이메일, 주소, 아이디, 가입일, 차량구분, 구매한제품, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 구매경로, 나이, 제품출시년월]],
-                                  columns=["이름 (Name)", "생년월일 (Date of Birth)", "성별 (Gender)", "휴대폰번호 (Phone Number)", "이메일 (Email)", "주소 (Address)", "아이디 (User ID)",
-                                           "가입일 (Registration Date)", "차량구분(vehicle types)", "구매한 제품 (Purchased Product)", "제품 구매 날짜 (Purchase Date)", "거래 금액 (Transaction Amount)",
-                                           "거래 방식 (Transaction Method)", "제품 구매 빈도 (Purchase Frequency)", "제품 구매 경로 (Purchase Path)", "연령대", "제품 출시년월 (Launch Date)"])
+        # 필요한 컬럼만 포함된 데이터프레임 생성
+        input_data = pd.DataFrame([[나이, 거래금액, 구매빈도, 성별, 차량구분, 거래방식, 제품출시년월, 제품구매날짜]],
+                                  columns=["연령대", "거래 금액 (Transaction Amount)", "제품 구매 빈도 (Purchase Frequency)", 
+                                           "성별 (Gender)", "차량구분(vehicle types)", "거래 방식 (Transaction Method)", 
+                                           "제품 출시년월 (Launch Date)", "제품 구매 날짜 (Purchase Date)"])
 
         # 예측 실행
         prediction = model.predict(input_data)
@@ -97,15 +131,23 @@ def run_input_customer_info():
         st.write(f"고객 유형: {customer_type}")
         st.write(f"특징: {characteristics}")
 
-        # 클러스터링 결과와 고객 정보를 데이터프레임에 추가
-        input_data["Cluster"] = prediction[0]
+        # 클러스터링 결과와 고객 정보를 데이터프레임에 추가 (전체 고객 정보도 포함)
+        input_data["Cluster"] = cluster_id
+        # 모든 입력된 고객 정보를 포함하여 데이터 저장
+        full_data = pd.DataFrame([[이름, 생년월일, 성별, 휴대폰번호, 이메일, 주소, 아이디, 가입일, 차량구분, 구매한제품, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 구매경로, 나이, 제품출시년월, cluster_id]],
+                                 columns=["이름 (Name)", "생년월일 (Date of Birth)", "성별 (Gender)", "휴대폰번호 (Phone Number)", 
+                                          "이메일 (Email)", "주소 (Address)", "아이디 (User ID)", "가입일 (Registration Date)", 
+                                          "차량구분(vehicle types)", "구매한 제품 (Purchased Product)", "제품 구매 날짜 (Purchase Date)", 
+                                          "거래 금액 (Transaction Amount)", "거래 방식 (Transaction Method)", 
+                                          "제품 구매 빈도 (Purchase Frequency)", "제품 구매 경로 (Purchase Path)", 
+                                          "연령대", "제품 출시년월 (Launch Date)", "Cluster"])
 
         # 고객 데이터를 CSV 파일에 추가
         file_path = '/Users/marurun66/Documents/GitHub/customer_mini/클러스터링고객데이터.csv'
         file_exists = pd.io.common.file_exists(file_path)
 
         # 데이터 저장
-        input_data.to_csv(file_path, mode='a', header=not file_exists, index=False)
+        full_data.to_csv(file_path, mode='a', header=not file_exists, index=False)
         st.write(f"고객 정보가 '{file_path}' 파일에 저장되었습니다.")
         print(f"파일 저장 위치: {file_path}")
 
