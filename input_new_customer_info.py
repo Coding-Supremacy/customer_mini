@@ -3,7 +3,8 @@ import pandas as pd
 import joblib
 from datetime import datetime
 import re
-from num2words import num2words
+from num2words import num2words # 숫자를 한글로 변환하는 라이브러리
+import requests
 
 # 클러스터 ID에 대한 설명
 cluster_description = {
@@ -41,6 +42,61 @@ def number_to_korean(num):
         return "0 원"  # 0일 경우 처리
     return num2words(num, to='currency', lang='ko')
 
+
+# 카카오 로그인 URL 생성
+def create_kakao_login_url():
+    KAKAO_CLIENT_ID = "8e31106f3f70372239cbabeeef99fd70"  # 카카오 개발자 센터에서 발급받은 앱 키
+    REDIRECT_URI = "http://localhost:8501"  # 리디렉션 URI
+    KAKAO_AUTH_URL = f"https://kauth.kakao.com/oauth/authorize?response_type=code&client_id={KAKAO_CLIENT_ID}&redirect_uri={REDIRECT_URI}"
+    return KAKAO_AUTH_URL
+
+# 카카오 OAuth 인증 코드로 액세스 토큰을 얻는 함수
+def get_access_token_from_kakao(code):
+    url = "https://kauth.kakao.com/oauth/token"
+    data = {
+        "grant_type": "authorization_code",
+        "client_id": "YOUR_CLIENT_ID",  # 카카오 개발자 센터에서 받은 앱 키
+        "redirect_uri": "http://localhost:8501",  # 리디렉션 URI
+        "code": code
+    }
+    response = requests.post(url, data=data)
+    if response.status_code == 200:
+        access_token = response.json().get("access_token")
+        return access_token
+    else:
+        st.error("액세스 토큰 발급 실패")
+        return None
+
+# 카카오톡 메시지 전송 함수
+def send_kakao_message_to_customer(access_token):
+    kakao_url = "http://pf.kakao.com/_lkVXn"  # 카카오 채널 URL
+    message = f"안녕하세요! 카카오톡 친구 추가를 통해 다양한 혜택을 확인해보세요! {kakao_url}"
+
+    url = "https://kapi.kakao.com/v2/api/talk/memo/send"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "template_object": {
+            "object_type": "text",
+            "text": message,
+            "link": {
+                "web_url": kakao_url,
+                "mobile_web_url": kakao_url
+            }
+        }
+    }
+
+    response = requests.post(url, headers=headers, json=data)
+
+    if response.status_code == 200:
+        st.success("카카오톡 친구 추가 링크가 성공적으로 전송되었습니다!")
+    else:
+        st.error(f"메시지 전송 실패: {response.status_code}, {response.text}")
+
+
 def run_input_customer_info():    
 
     # 고객 개인정보 입력.
@@ -63,7 +119,7 @@ def run_input_customer_info():
     주소 = st.text_input("주소 입력", key="address_input")
     아이디 = st.text_input("아이디 입력", key="id_input")
     가입일 = st.date_input("가입일 입력", min_value=datetime(1900, 1, 1), key="registration_date_input")
-    고객세그먼트= st.selectbox("고객 세그먼트 선택", ["신규","VIP", "일반"],index=0 ,key="customer_segment_select")
+    고객세그먼트= st.selectbox("고객 세그먼트 선택", ["신규","VIP", "일반","이탈가능"],index=0 ,key="customer_segment_select")
 
     # 현재 날짜에서 20년 전의 날짜를 구하기
     today = datetime.today()
@@ -133,13 +189,18 @@ def run_input_customer_info():
         st.write(f"예측된 클러스터: {cluster_id}")
         st.write(f"고객 유형: {customer_type}")
         st.write(f"특징: {characteristics}")
+        # 예측 후 카카오톡 메시지 전송 (액세스 토큰 필요)
+        access_token = "YOUR_ACCESS_TOKEN"  # 카카오 로그인 후 얻은 액세스 토큰
+
+        if access_token:
+            send_kakao_message_to_customer(access_token)
 
         # 클러스터링 결과와 고객 정보를 데이터프레임에 추가 (전체 고객 정보도 포함)
         input_data["Cluster"] = cluster_id
         # 모든 입력된 고객 정보를 포함하여 데이터 저장
         # 고객 정보를 포함한 데이터프레임 생성
         full_data = pd.DataFrame([[이름, 생년월일, 연령, 성별, 휴대폰번호_포맷, 이메일, 주소, 아이디, 가입일, 고객세그먼트, 차량구분, 구매한제품, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 구매경로, 제품출시년월, cluster_id]],
-                                columns=["이름 (Name)", "생년월일 (Date of Birth)","연령" "성별 (Gender)", "휴대폰번호 (Phone Number)", 
+                                columns=["이름 (Name)", "생년월일 (Date of Birth)","연령", "성별 (Gender)", "휴대폰번호 (Phone Number)", 
                                         "이메일 (Email)", "주소 (Address)", "아이디 (User ID)", "가입일 (Registration Date)", "고객 세그먼트 (Customer Segment)",
                                         "차량구분(vehicle types)", "구매한 제품 (Purchased Product)", "제품 구매 날짜 (Purchase Date)", 
                                         "거래 금액 (Transaction Amount)", "거래 방식 (Transaction Method)", 
@@ -154,6 +215,7 @@ def run_input_customer_info():
         full_data.to_csv(file_path, mode='a', header=not file_exists, index=False)
         st.write(f"고객 정보가 {file_path}에 저장되었습니다.")
         print(f"파일 저장 위치: {file_path}")
+
 
 if __name__ == "__main__":
     run_input_customer_info()
