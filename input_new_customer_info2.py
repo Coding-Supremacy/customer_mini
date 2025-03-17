@@ -8,9 +8,11 @@ import requests
 import base64
 
 
-# secrets.toml에서 client_id와 client_secret 불러오기
-client_id = st.secrets["KAKAO"]["client_id"]
-redirect_uri = st.secrets["KAKAO"]["redirect_uri"]
+# # secrets.toml에서 client_id와 client_secret 불러오기
+# client_id = st.secrets["KAKAO"]["client_id"]
+# redirect_uri = st.secrets["KAKAO"]["redirect_uri"]
+
+
 # 클러스터 ID에 대한 설명
 cluster_description = {
     0: ("고연령층 세단 구매 고객", "50대 후반, 준중형 세단 선호, 카드 결제, 거래 금액 높음,주로 VIP 고객"),
@@ -46,63 +48,63 @@ def number_to_korean(num):
         return "0 원"  # 0일 경우 처리
     return num2words(num, to='currency', lang='ko')
 
-# 카카오 로그인 URL 생성
-def create_kakao_login_url():
-    KAKAO_CLIENT_ID = client_id
-    REDIRECT_URI = redirect_uri  # 리디렉션 URI
-    KAKAO_AUTH_URL = f"https://kauth.kakao.com/oauth/authorize?response_type=code&client_id={KAKAO_CLIENT_ID}&redirect_uri={REDIRECT_URI}"
-    return KAKAO_AUTH_URL
+# # 카카오 로그인 URL 생성
+# def create_kakao_login_url():
+#     KAKAO_CLIENT_ID = client_id
+#     REDIRECT_URI = redirect_uri  # 리디렉션 URI
+#     KAKAO_AUTH_URL = f"https://kauth.kakao.com/oauth/authorize?response_type=code&client_id={KAKAO_CLIENT_ID}&redirect_uri={REDIRECT_URI}"
+#     return KAKAO_AUTH_URL
 
 # 카카오 OAuth 인증 코드로 액세스 토큰을 얻는 함수
 #앱 키 secret.toml에서 가져오기
 
 
-def get_access_token_from_kakao(code):
-    url = "https://kauth.kakao.com/oauth/token"
+# def get_access_token_from_kakao(code):
+#     url = "https://kauth.kakao.com/oauth/token"
 
 
-    data = {
-        "grant_type": "authorization_code",
-        "client_id": client_id,  # 카카오 개발자 센터에서 받은 앱 키
-        "redirect_uri": redirect_uri,  # 리디렉션 URI
-        "code": code
-    }
-    response = requests.post(url, data=data)
-    if response.status_code == 200:
-        access_token = response.json().get("access_token")
-        return access_token
-    else:
-        st.error("액세스 토큰 발급 실패")
-        return None
+#     data = {
+#         "grant_type": "authorization_code",
+#         "client_id": client_id,  # 카카오 개발자 센터에서 받은 앱 키
+#         "redirect_uri": redirect_uri,  # 리디렉션 URI
+#         "code": code
+#     }
+#     response = requests.post(url, data=data)
+#     if response.status_code == 200:
+#         access_token = response.json().get("access_token")
+#         return access_token
+#     else:
+#         st.error("액세스 토큰 발급 실패")
+#         return None
 
-# 카카오톡 메시지 전송 함수
-def send_kakao_message_to_customer(access_token):
-    kakao_url = "http://pf.kakao.com/_lkVXn"  # 카카오 채널 URL
-    message = f"안녕하세요! 카카오톡 친구 추가를 통해 다양한 혜택을 확인해보세요! {kakao_url}"
+# # 카카오톡 메시지 전송 함수
+# def send_kakao_message_to_customer(access_token):
+#     kakao_url = "http://pf.kakao.com/_lkVXn"  # 카카오 채널 URL
+#     message = f"안녕하세요! 카카오톡 친구 추가를 통해 다양한 혜택을 확인해보세요! {kakao_url}"
 
-    url = "https://kapi.kakao.com/v2/api/talk/memo/send"
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json"
-    }
+#     url = "https://kapi.kakao.com/v2/api/talk/memo/send"
+#     headers = {
+#         "Authorization": f"Bearer {access_token}",
+#         "Content-Type": "application/json"
+#     }
 
-    data = {
-        "template_object": {
-            "object_type": "text",
-            "text": message,
-            "link": {
-                "web_url": kakao_url,
-                "mobile_web_url": kakao_url
-            }
-        }
-    }
+#     data = {
+#         "template_object": {
+#             "object_type": "text",
+#             "text": message,
+#             "link": {
+#                 "web_url": kakao_url,
+#                 "mobile_web_url": kakao_url
+#             }
+#         }
+#     }
 
-    response = requests.post(url, headers=headers, json=data)
+#     response = requests.post(url, headers=headers, json=data)
 
-    if response.status_code == 200:
-        st.success("카카오톡 친구 추가 링크가 성공적으로 전송되었습니다!")
-    else:
-        st.error(f"메시지 전송 실패: {response.status_code}, {response.text}")
+#     if response.status_code == 200:
+#         st.success("카카오톡 친구 추가 링크가 성공적으로 전송되었습니다!")
+#     else:
+#         st.error(f"메시지 전송 실패: {response.status_code}, {response.text}")
 
 def run_input_customer_info():
     # 고객 개인정보 입력.
@@ -173,8 +175,7 @@ def run_input_customer_info():
     if len(휴대폰번호) != 11:
         st.error("휴대폰 번호는 11자리 숫자여야 합니다.")
         return
-    # 하이픈 추가 (010-xxxx-xxxx 형식으로 변환)
-    휴대폰번호_포맷 = f"{휴대폰번호[:3]}-{휴대폰번호[3:7]}-{휴대폰번호[7:]}"
+   
 
     # 모델에 맞는 컬럼만 사용하여 입력 데이터 준비
     if st.button("예측하기"):
@@ -194,17 +195,17 @@ def run_input_customer_info():
         st.write(f"예측된 클러스터: {cluster_id}")
         st.write(f"고객 유형: {customer_type}")
         st.write(f"특징: {characteristics}")
-        # 예측 후 카카오톡 메시지 전송 (액세스 토큰 필요)
-        access_token = "YOUR_ACCESS_TOKEN"  # 카카오 로그인 후 얻은 액세스 토큰
+        # # 예측 후 카카오톡 메시지 전송 (액세스 토큰 필요)
+        # access_token = "YOUR_ACCESS_TOKEN"  # 카카오 로그인 후 얻은 액세스 토큰
 
-        if access_token:
-            send_kakao_message_to_customer(access_token)
+        # if access_token:
+        #     send_kakao_message_to_customer(access_token)
 
         # 클러스터링 결과와 고객 정보를 데이터프레임에 추가 (전체 고객 정보도 포함)
         input_data["Cluster"] = cluster_id
         # 모든 입력된 고객 정보를 포함하여 데이터 저장
         # 고객 정보를 포함한 데이터프레임 생성
-        full_data = pd.DataFrame([[이름, 생년월일, 연령, 성별, 휴대폰번호_포맷, 이메일, 주소, 아이디, 가입일, 고객세그먼트, 차량구분, 구매한제품, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 구매경로, 제품출시년월, cluster_id]],
+        full_data = pd.DataFrame([[이름, 생년월일, 연령, 성별, 휴대폰번호, 이메일, 주소, 아이디, 가입일, 고객세그먼트, 차량구분, 구매한제품, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 구매경로, 제품출시년월, cluster_id]],
                                 columns=["이름 (Name)", "생년월일 (Date of Birth)","연령", "성별 (Gender)", "휴대폰번호 (Phone Number)", 
                                         "이메일 (Email)", "주소 (Address)", "아이디 (User ID)", "가입일 (Registration Date)", "고객 세그먼트 (Customer Segment)",
                                         "차량구분(vehicle types)", "구매한 제품 (Purchased Product)", "제품 구매 날짜 (Purchase Date)", 
@@ -222,12 +223,12 @@ def run_input_customer_info():
         print(f"파일 저장 위치: {file_path}")
 
         # ClickSend API를 사용하여 SMS 보내기
-        clicksend_username = st.secrets["CLICKSEND_USERNAME"]  # ClickSend 계정 사용자 이름
-        clicksend_api_key = st.secrets["CLICKSEND_API_KEY"]    # ClickSend API 키
+        clicksend_username = st.secrets["CLICKSEND"]["CLICKSEND_USERNAME"]  # ClickSend 계정 사용자 이름
+        clicksend_api_key = st.secrets["CLICKSEND"]["CLICKSEND_API_KEY"]    # ClickSend API 키
 
         # 수신자 번호 및 메시지 내용
         to_number = "+82" + 휴대폰번호[1:]
-        message_body = f"안녕하세요! 고객님을 환영합니다. 예측된 클러스터: {cluster_id}, 고객 유형: {customer_type},카카오톡 채널 추가 : http://pf.kakao.com/_lkVXn"
+        message_body = f"안녕하세요! 고객님을 환영합니다. 예측된 클러스터: {cluster_id}, 고객 유형: {customer_type}"
 
         # API 요청 URL 및 헤더 설정
         url = "https://rest.clicksend.com/v3/sms/send"
