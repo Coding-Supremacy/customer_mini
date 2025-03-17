@@ -10,8 +10,7 @@ from ui.input_new_customer_info2 import run_input_customer_info
 
 
 def run_app():
-
-    st.title('미니프로젝트')
+    st.set_page_config(page_title="My Streamlit App", layout="wide")
 
     menu = ['Home', 'Description', 'EDA', 'New Customer Info']
     choice = st.sidebar.selectbox('Menu', menu)
