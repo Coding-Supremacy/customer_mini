@@ -3,7 +3,14 @@ import pandas as pd
 import joblib
 from datetime import datetime
 import re
+<<<<<<<<< Temporary merge branch 1
 from num2words import num2words
+import requests
+import base64
+=========
+from num2words import num2words # 숫자를 한글로 변환하는 라이브러리
+import requests
+>>>>>>>>> Temporary merge branch 2
 
 # 클러스터 ID에 대한 설명
 cluster_description = {
@@ -214,6 +221,45 @@ def run_input_customer_info():
         full_data.to_csv(file_path, mode='a', header=not file_exists, index=False)
         st.write(f"고객 정보가 {file_path}에 저장되었습니다.")
         print(f"파일 저장 위치: {file_path}")
+
+<<<<<<<<< Temporary merge branch 1
+        # ClickSend API를 사용하여 SMS 보내기
+        clicksend_username = st.secrets["CLICKSEND_USERNAME"]  # ClickSend 계정 사용자 이름
+        clicksend_api_key = st.secrets["CLICKSEND_API_KEY"]    # ClickSend API 키
+
+        # 수신자 번호 및 메시지 내용
+        to_number = "+82" + 휴대폰번호[1:]
+        message_body = f"안녕하세요! 고객님을 환영합니다. 예측된 클러스터: {cluster_id}, 고객 유형: {customer_type}"
+
+        # API 요청 URL 및 헤더 설정
+        url = "https://rest.clicksend.com/v3/sms/send"
+        auth_header = f"Basic {base64.b64encode(f'{clicksend_username}:{clicksend_api_key}'.encode()).decode()}"
+
+        headers = {
+            "Authorization": auth_header,
+            "Content-Type": "application/json"
+        }
+
+        # 요청 데이터
+        data = {
+            "messages": [
+                {
+                    "source": "sdk",
+                    "body": message_body,
+                    "to": to_number
+                }
+            ]
+        }
+
+        try:
+            response = requests.post(url, headers=headers, json=data)
+            print("Message sent successfully:", response.json())
+        except Exception as e:
+            print("Error sending SMS:", e)
+
+
+=========
+>>>>>>>>> Temporary merge branch 2
 
 if __name__ == "__main__":
     run_input_customer_info()
