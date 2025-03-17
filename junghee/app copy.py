@@ -1,24 +1,23 @@
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-import smtplib
+
 import streamlit as st
 import pandas as pd
 import joblib
 from datetime import datetime
+import time
 import re
 from num2words import num2words
+import promo_email
+
+
 
 # 클러스터 ID에 대한 설명
 cluster_description = {
-    0: ("고연령층 세단 구매 고객", "50대 후반, 준중형 세단 선호, 카드 결제, 거래 금액 높음"),
-    1: ("고급차 VIP 고객", "40~50대, 고급 세단(G80, G70 등) 구매, 거래 금액 높음"),
-    2: ("SUV 패밀리 고객", "30~40대, 중형대형 SUV 선호, 가족용 차량"),
-    3: ("신차 선호 고객", "최근 출시된 차량 구매, 반복 구매 가능성 높음"),
-    4: ("경제형 차량 구매 고객", "30~40대, 보급형 세단(아반떼, 쏘나타) 구매, 카드 결제"),
-    5: ("현금 구매 고객", "50대 이상, 중고차 및 SUV 구매, 현금 결제 비율 높음"),
-    6: ("1회성 구매 고객", "연령대 다양, 한 번 구매 후 재구매 가능성 낮음"),
-    7: ("친환경차 관심 고객", "20~40대, NEXO 등 친환경차 구매, 정부 지원 혜택 영향"),
-    8: ("오프라인 중심 고객", "40대 이상, 딜러 대면 상담 후 구매, 시승 경험 선호")
+    0: ("고연령층 세단 구매 고객", "50대 후반, 준중형 세단 선호, 카드 결제, 거래 금액 높음,주로 VIP 고객"),
+    1: ("고급차 VIP 고객", "40~50대, 고급 세단(G80, G70 등) 구매, 거래 금액 높음,주로 VIP 고객"),
+    2: ("SUV 패밀리 고객", "30~40대, 중형대형 SUV 선호, 가족용 차량, 주로 일반 고객"),
+    3: ("신차 선호 고객", "최근 출시된 차량 구매, 반복 구매 가능성 높음, 주로 신규 고객"),
+    4: ("경제형 차량 구매 고객", "30~40대, 보급형 세단(아반떼, 쏘나타) 구매, 카드 결제, 주로 일반 고객"),
+    5: ("현금 구매 고객", "50대 이상, 중고차 및 SUV 구매, 현금 결제 비율 높음, 주로 일반 고객")
 }
 
 
@@ -49,11 +48,13 @@ def number_to_korean(num):
 
 def run_input_customer_info():    
 
+    
+
     # 고객 개인정보 입력.
     st.title('고객 정보 입력')
 
     # 모델 로드
-    model = joblib.load("model.pkl")
+    model = joblib.load("model2.pkl")
 
     # 입력 폼 생성
     st.header("데이터 입력")
@@ -65,8 +66,8 @@ def run_input_customer_info():
     이메일 = st.text_input("이메일 입력", key="email_input")
     주소 = st.text_input("주소 입력", key="address_input")
     아이디 = st.text_input("아이디 입력", key="id_input")
-    가입일 = st.date_input("가입일 입력", min_value=datetime(1900, 1, 1), max_value=datetime.today(), key="registration_date_input")
-
+    가입일 = st.date_input("가입일 입력", min_value=datetime(1900, 1, 1), key="registration_date_input")
+    고객세그먼트= st.selectbox("고객 세그먼트 선택", ["신규","VIP", "일반"],index=0 ,key="customer_segment_select")
 
     # 현재 날짜에서 20년 전의 날짜를 구하기
     today = datetime.today()
@@ -97,7 +98,7 @@ def run_input_customer_info():
 
     # 구매한 제품 선택
     구매한제품 = st.selectbox("구입 모델 선택", list(launch_dates.keys()), key="purchased_product_select")
-    제품구매날짜 = st.date_input("제품 구매 날짜 입력", min_value=datetime(1900, 1, 1), max_value=datetime.today(), key="purchase_date_input")
+    제품구매날짜 = st.date_input("제품 구매 날짜 입력", min_value=datetime(1900, 1, 1),  key="purchase_date_input")
 
     # 선택된 제품에 따른 자동 출시 년월 매핑
     제품출시년월 = launch_dates.get(구매한제품, "")
@@ -105,24 +106,30 @@ def run_input_customer_info():
     if 제품출시년월:
         st.write(f"선택하신 모델의 출시 년월: {제품출시년월}")
 
-    # 휴대폰 번호 정리 (하이픈(-) 제거 및 11자 검사)
-    휴대폰번호 = re.sub(r'[^0-9]', '', 휴대폰번호)  # 하이픈 제거
+    # 하이픈을 포함한 휴대폰 번호 포맷팅
+    휴대폰번호 = re.sub(r'[^0-9]', '', 휴대폰번호)  # 숫자만 추출
+
+    # 휴대폰 번호가 11자리인지 확인
     if len(휴대폰번호) != 11:
         st.error("휴대폰 번호는 11자리 숫자여야 합니다.")
-        return  # 에러 발생 시 진행하지 않도록 return
+        return
 
+    # 하이픈 추가 (010-xxxx-xxxx 형식으로 변환)
+    휴대폰번호_포맷 = f"{휴대폰번호[:3]}-{휴대폰번호[3:7]}-{휴대폰번호[7:]}"
+
+    st.write(f"입력한 휴대폰 번호: {휴대폰번호_포맷}")
     # 이메일 검사 (@ 포함 여부 확인)
     if '@' not in 이메일:
         st.error("이메일에 '@' 문자가 포함되어야 합니다.")
-        return  # 에러 발생 시 진행하지 않도록 return
+        return
 
     # 모델에 맞는 컬럼만 사용하여 입력 데이터 준비
     if st.button("예측하기"):
         # 필요한 컬럼만 포함된 데이터프레임 생성
-        input_data = pd.DataFrame([[나이, 거래금액, 구매빈도, 성별, 차량구분, 거래방식, 제품출시년월, 제품구매날짜]],
-                                  columns=["연령대", "거래 금액 (Transaction Amount)", "제품 구매 빈도 (Purchase Frequency)", 
-                                           "성별 (Gender)", "차량구분(vehicle types)", "거래 방식 (Transaction Method)", 
-                                           "제품 출시년월 (Launch Date)", "제품 구매 날짜 (Purchase Date)"])
+        input_data = pd.DataFrame([[나이, 거래금액, 구매빈도, 성별, 차량구분, 거래방식, 제품출시년월, 제품구매날짜, 고객세그먼트]],
+                                columns=["연령대", "거래 금액 (Transaction Amount)", "제품 구매 빈도 (Purchase Frequency)", 
+                                        "성별 (Gender)", "차량구분(vehicle types)", "거래 방식 (Transaction Method)", 
+                                        "제품 출시년월 (Launch Date)", "제품 구매 날짜 (Purchase Date)", "고객 세그먼트 (Customer Segment)"])
 
         # 예측 실행
         prediction = model.predict(input_data)
@@ -138,61 +145,31 @@ def run_input_customer_info():
         # 클러스터링 결과와 고객 정보를 데이터프레임에 추가 (전체 고객 정보도 포함)
         input_data["Cluster"] = cluster_id
         # 모든 입력된 고객 정보를 포함하여 데이터 저장
-        full_data = pd.DataFrame([[이름, 생년월일, 성별, 휴대폰번호, 이메일, 주소, 아이디, 가입일, 차량구분, 구매한제품, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 구매경로, 나이, 제품출시년월, cluster_id]],
+        full_data = pd.DataFrame([[이름, 생년월일, 성별, 휴대폰번호_포맷, 이메일, 주소, 아이디, 가입일, 차량구분, 구매한제품, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 구매경로, 나이, 제품출시년월, cluster_id,고객세그먼트]],
                                  columns=["이름 (Name)", "생년월일 (Date of Birth)", "성별 (Gender)", "휴대폰번호 (Phone Number)", 
                                           "이메일 (Email)", "주소 (Address)", "아이디 (User ID)", "가입일 (Registration Date)", 
                                           "차량구분(vehicle types)", "구매한 제품 (Purchased Product)", "제품 구매 날짜 (Purchase Date)", 
                                           "거래 금액 (Transaction Amount)", "거래 방식 (Transaction Method)", 
                                           "제품 구매 빈도 (Purchase Frequency)", "제품 구매 경로 (Purchase Path)", 
-                                          "연령대", "제품 출시년월 (Launch Date)", "Cluster"])
+                                          "연령대", "제품 출시년월 (Launch Date)", "Cluster","고객 세그먼트 (Customer Segment)"])
 
         # 고객 데이터를 CSV 파일에 추가
-        file_path = '클러스터링고객데이터.csv'
+        file_path = '클러스터링고객데이터_2.csv'
         file_exists = pd.io.common.file_exists(file_path)
 
         # 데이터 저장
         full_data.to_csv(file_path, mode='a', header=not file_exists, index=False)
-        st.write(f"고객 정보가 '{file_path}' 파일에 저장되었습니다.")
+        st.write(f"고객 정보가 {file_path}에 저장되었습니다.")
         print(f"파일 저장 위치: {file_path}")
 
+        # 이메일 발송
+        promo_email.send_promotion_email(이메일, 이름, cluster_id)
 
-        # 이메일 보내기
-        # SMTP 서버 설정
-        SMTP_SERVER = "smtp.gmail.com"
-        SMTP_PORT = 587
-        EMAIL_ADDRESS = "qhrehlwl111@gmail.com"
-        EMAIL_PASSWORD = "nyaw spns mndv gsnb"  # 보안 강화를 위해 앱 비밀번호 사용
+        with st.spinner("이메일 발송 중.."):
+            time.sleep(3)
+            st.success("이메일이 성공적으로 발송되었습니다.")
 
-        def send_email(이메일, 이름):
-            # 이메일 제목 및 본문
-            subject = f"{이름}님, 맞춤형 차량 추천을 확인하세요!"
-            body = f"""
-            안녕하세요, {이름}님.
-
-            고객님의 맞춤형 차량 추천을 준비했습니다.
-            자세한 내용은 백오피스에서 확인해 주세요.
-
-            감사합니다.
-            """
-
-            # 이메일 생성
-            msg = MIMEMultipart()
-            msg["From"] = EMAIL_ADDRESS
-            msg["To"] = 이메일
-            msg["Subject"] = subject
-            msg.attach(MIMEText(body, "plain"))
-
-            # SMTP 서버 연결 및 이메일 전송
-            with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
-                server.starttls()  # 보안 연결
-                server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
-                server.sendmail(EMAIL_ADDRESS, 이메일, msg.as_string())
-
-            print(f"✅ 이메일 전송 완료: {이메일}")
-
-        # 이메일 보내기 실행
-        send_email(이메일, 이름)
-        st.write(f"이메일을 {이메일} 주소로 전송했습니다.")
+        
 
 if __name__ == "__main__":
     run_input_customer_info()
