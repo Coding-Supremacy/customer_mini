@@ -62,7 +62,7 @@ def run_input_customer_info():
     이메일 = st.text_input("이메일 입력", key="email_input")
     주소 = st.text_input("주소 입력", key="address_input")
     아이디 = st.text_input("아이디 입력", key="id_input")
-    가입일 = st.date_input("가입일 입력", min_value=datetime(1900, 1, 1), max_value=datetime.today(), key="registration_date_input")
+    가입일 = st.date_input("가입일 입력", min_value=datetime(1900, 1, 1), key="registration_date_input")
 
 
     # 현재 날짜에서 20년 전의 날짜를 구하기
@@ -94,7 +94,7 @@ def run_input_customer_info():
 
     # 구매한 제품 선택
     구매한제품 = st.selectbox("구입 모델 선택", list(launch_dates.keys()), key="purchased_product_select")
-    제품구매날짜 = st.date_input("제품 구매 날짜 입력", min_value=datetime(1900, 1, 1), max_value=datetime.today(), key="purchase_date_input")
+    제품구매날짜 = st.date_input("제품 구매 날짜 입력", min_value=datetime(1900, 1, 1),  key="purchase_date_input")
 
     # 선택된 제품에 따른 자동 출시 년월 매핑
     제품출시년월 = launch_dates.get(구매한제품, "")
@@ -106,12 +106,12 @@ def run_input_customer_info():
     휴대폰번호 = re.sub(r'[^0-9]', '', 휴대폰번호)  # 하이픈 제거
     if len(휴대폰번호) != 11:
         st.error("휴대폰 번호는 11자리 숫자여야 합니다.")
-        return  # 에러 발생 시 진행하지 않도록 return
+        return
 
     # 이메일 검사 (@ 포함 여부 확인)
     if '@' not in 이메일:
         st.error("이메일에 '@' 문자가 포함되어야 합니다.")
-        return  # 에러 발생 시 진행하지 않도록 return
+        return
 
     # 모델에 맞는 컬럼만 사용하여 입력 데이터 준비
     if st.button("예측하기"):
