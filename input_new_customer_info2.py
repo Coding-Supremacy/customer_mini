@@ -3,14 +3,9 @@ import pandas as pd
 import joblib
 from datetime import datetime
 import re
-<<<<<<<<< Temporary merge branch 1
 from num2words import num2words
 import requests
 import base64
-=========
-from num2words import num2words # 숫자를 한글로 변환하는 라이브러리
-import requests
->>>>>>>>> Temporary merge branch 2
 
 # 클러스터 ID에 대한 설명
 cluster_description = {
@@ -21,7 +16,6 @@ cluster_description = {
     4: ("경제형 차량 구매 고객", "30~40대, 보급형 세단(아반떼, 쏘나타) 구매, 카드 결제, 주로 일반 고객"),
     5: ("현금 구매 고객", "50대 이상, 중고차 및 SUV 구매, 현금 결제 비율 높음, 주로 일반 고객")
 }
-
 
 # 모델과 출시 년월 데이터
 launch_dates = {
@@ -47,7 +41,6 @@ def number_to_korean(num):
     if num == 0:
         return "0 원"  # 0일 경우 처리
     return num2words(num, to='currency', lang='ko')
-
 
 # 카카오 로그인 URL 생성
 def create_kakao_login_url():
@@ -102,9 +95,7 @@ def send_kakao_message_to_customer(access_token):
     else:
         st.error(f"메시지 전송 실패: {response.status_code}, {response.text}")
 
-
-def run_input_customer_info():    
-
+def run_input_customer_info():
     # 고객 개인정보 입력.
     st.title('고객 정보 입력')
 
@@ -125,7 +116,7 @@ def run_input_customer_info():
     주소 = st.text_input("주소 입력", key="address_input")
     아이디 = st.text_input("아이디 입력", key="id_input")
     가입일 = st.date_input("가입일 입력", min_value=datetime(1900, 1, 1), key="registration_date_input")
-    고객세그먼트= st.selectbox("고객 세그먼트 선택", ["신규","VIP", "일반","이탈가능"],index=0 ,key="customer_segment_select")
+    고객세그먼트 = st.selectbox("고객 세그먼트 선택", ["신규","VIP", "일반","이탈가능"], index=0, key="customer_segment_select")
 
     # 현재 날짜에서 20년 전의 날짜를 구하기
     today = datetime.today()
@@ -156,7 +147,7 @@ def run_input_customer_info():
 
     # 구매한 제품 선택
     구매한제품 = st.selectbox("구입 모델 선택", list(launch_dates.keys()), key="purchased_product_select")
-    제품구매날짜 = st.date_input("제품 구매 날짜 입력", min_value=datetime(1900, 1, 1),  key="purchase_date_input")
+    제품구매날짜 = st.date_input("제품 구매 날짜 입력", min_value=datetime(1900, 1, 1), key="purchase_date_input")
 
     # 선택된 제품에 따른 자동 출시 년월 매핑
     제품출시년월 = launch_dates.get(구매한제품, "")
@@ -164,13 +155,12 @@ def run_input_customer_info():
     if 제품출시년월:
         st.write(f"선택하신 모델의 출시 년월: {제품출시년월}")
 
-
     # 이메일 검사 (@ 포함 여부 확인)
     if '@' not in 이메일:
         st.error("이메일에 '@' 문자가 포함되어야 합니다.")
         return
     
-        # 휴대폰 번호가 11자리인지 확인
+    # 휴대폰 번호가 11자리인지 확인
     if len(휴대폰번호) != 11:
         st.error("휴대폰 번호는 11자리 숫자여야 합니다.")
         return
@@ -221,45 +211,6 @@ def run_input_customer_info():
         full_data.to_csv(file_path, mode='a', header=not file_exists, index=False)
         st.write(f"고객 정보가 {file_path}에 저장되었습니다.")
         print(f"파일 저장 위치: {file_path}")
-
-<<<<<<<<< Temporary merge branch 1
-        # ClickSend API를 사용하여 SMS 보내기
-        clicksend_username = st.secrets["CLICKSEND_USERNAME"]  # ClickSend 계정 사용자 이름
-        clicksend_api_key = st.secrets["CLICKSEND_API_KEY"]    # ClickSend API 키
-
-        # 수신자 번호 및 메시지 내용
-        to_number = "+82" + 휴대폰번호[1:]
-        message_body = f"안녕하세요! 고객님을 환영합니다. 예측된 클러스터: {cluster_id}, 고객 유형: {customer_type}"
-
-        # API 요청 URL 및 헤더 설정
-        url = "https://rest.clicksend.com/v3/sms/send"
-        auth_header = f"Basic {base64.b64encode(f'{clicksend_username}:{clicksend_api_key}'.encode()).decode()}"
-
-        headers = {
-            "Authorization": auth_header,
-            "Content-Type": "application/json"
-        }
-
-        # 요청 데이터
-        data = {
-            "messages": [
-                {
-                    "source": "sdk",
-                    "body": message_body,
-                    "to": to_number
-                }
-            ]
-        }
-
-        try:
-            response = requests.post(url, headers=headers, json=data)
-            print("Message sent successfully:", response.json())
-        except Exception as e:
-            print("Error sending SMS:", e)
-
-
-=========
->>>>>>>>> Temporary merge branch 2
 
 if __name__ == "__main__":
     run_input_customer_info()
