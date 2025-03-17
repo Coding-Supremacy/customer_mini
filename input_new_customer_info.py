@@ -56,6 +56,16 @@ def run_input_customer_info():
     이름 = st.text_input("이름 입력", key="name_input")
     성별 = st.selectbox("성별 선택", ["남", "여"], key="gender_select")
     휴대폰번호 = st.text_input("휴대폰 번호 입력", key="phone_input")
+    # 하이픈을 포함한 휴대폰 번호 포맷팅
+    휴대폰번호 = re.sub(r'[^0-9]', '', 휴대폰번호)  # 숫자만 추출
+    # 휴대폰 번호가 11자리인지 확인
+    if len(휴대폰번호) != 11:
+        st.error("휴대폰 번호는 11자리 숫자여야 합니다.")
+        return
+    # 하이픈 추가 (010-xxxx-xxxx 형식으로 변환)
+    휴대폰번호_포맷 = f"{휴대폰번호[:3]}-{휴대폰번호[3:7]}-{휴대폰번호[7:]}"
+
+
     이메일 = st.text_input("이메일 입력", key="email_input")
     주소 = st.text_input("주소 입력", key="address_input")
     아이디 = st.text_input("아이디 입력", key="id_input")
@@ -74,8 +84,8 @@ def run_input_customer_info():
     생년월일 = st.date_input("생년월일 입력", min_value=datetime(1900, 1, 1), max_value=year_20_years_ago, key="dob_input")
     if 생년월일:
         today = datetime.today()
-        나이 = today.year - 생년월일.year - ((today.month, today.day) < (생년월일.month, 생년월일.day))
-        st.write(f"계산된 나이: {나이}세")
+        연령 = today.year - 생년월일.year - ((today.month, today.day) < (생년월일.month, 생년월일.day))
+        st.write(f"계산된 나이: {연령}세")
 
     # 거래금액 입력 (천 단위로 입력받기)
     거래금액 = st.number_input("거래 금액 입력", min_value=0, step=1000000, key="transaction_amount_input")
@@ -99,18 +109,7 @@ def run_input_customer_info():
     if 제품출시년월:
         st.write(f"선택하신 모델의 출시 년월: {제품출시년월}")
 
-    # 하이픈을 포함한 휴대폰 번호 포맷팅
-    휴대폰번호 = re.sub(r'[^0-9]', '', 휴대폰번호)  # 숫자만 추출
 
-    # 휴대폰 번호가 11자리인지 확인
-    if len(휴대폰번호) != 11:
-        st.error("휴대폰 번호는 11자리 숫자여야 합니다.")
-        return
-
-    # 하이픈 추가 (010-xxxx-xxxx 형식으로 변환)
-    휴대폰번호_포맷 = f"{휴대폰번호[:3]}-{휴대폰번호[3:7]}-{휴대폰번호[7:]}"
-
-    st.write(f"입력한 휴대폰 번호: {휴대폰번호_포맷}")
     # 이메일 검사 (@ 포함 여부 확인)
     if '@' not in 이메일:
         st.error("이메일에 '@' 문자가 포함되어야 합니다.")
@@ -119,8 +118,8 @@ def run_input_customer_info():
     # 모델에 맞는 컬럼만 사용하여 입력 데이터 준비
     if st.button("예측하기"):
         # 필요한 컬럼만 포함된 데이터프레임 생성
-        input_data = pd.DataFrame([[나이, 거래금액, 구매빈도, 성별, 차량구분, 거래방식, 제품출시년월, 제품구매날짜, 고객세그먼트]],
-                                columns=["연령대", "거래 금액 (Transaction Amount)", "제품 구매 빈도 (Purchase Frequency)", 
+        input_data = pd.DataFrame([[연령, 거래금액, 구매빈도, 성별, 차량구분, 거래방식, 제품출시년월, 제품구매날짜, 고객세그먼트]],
+                                columns=["연령", "거래 금액 (Transaction Amount)", "제품 구매 빈도 (Purchase Frequency)", 
                                         "성별 (Gender)", "차량구분(vehicle types)", "거래 방식 (Transaction Method)", 
                                         "제품 출시년월 (Launch Date)", "제품 구매 날짜 (Purchase Date)", "고객 세그먼트 (Customer Segment)"])
 
@@ -138,13 +137,14 @@ def run_input_customer_info():
         # 클러스터링 결과와 고객 정보를 데이터프레임에 추가 (전체 고객 정보도 포함)
         input_data["Cluster"] = cluster_id
         # 모든 입력된 고객 정보를 포함하여 데이터 저장
-        full_data = pd.DataFrame([[이름, 생년월일, 성별, 휴대폰번호_포맷, 이메일, 주소, 아이디, 가입일, 차량구분, 구매한제품, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 구매경로, 나이, 제품출시년월, cluster_id,고객세그먼트]],
-                                 columns=["이름 (Name)", "생년월일 (Date of Birth)", "성별 (Gender)", "휴대폰번호 (Phone Number)", 
-                                          "이메일 (Email)", "주소 (Address)", "아이디 (User ID)", "가입일 (Registration Date)", 
-                                          "차량구분(vehicle types)", "구매한 제품 (Purchased Product)", "제품 구매 날짜 (Purchase Date)", 
-                                          "거래 금액 (Transaction Amount)", "거래 방식 (Transaction Method)", 
-                                          "제품 구매 빈도 (Purchase Frequency)", "제품 구매 경로 (Purchase Path)", 
-                                          "연령대", "제품 출시년월 (Launch Date)", "Cluster","고객 세그먼트 (Customer Segment)"])
+        # 고객 정보를 포함한 데이터프레임 생성
+        full_data = pd.DataFrame([[이름, 생년월일, 연령, 성별, 휴대폰번호_포맷, 이메일, 주소, 아이디, 가입일, 고객세그먼트, 차량구분, 구매한제품, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 구매경로, 제품출시년월, cluster_id]],
+                                columns=["이름 (Name)", "생년월일 (Date of Birth)","연령", "성별 (Gender)", "휴대폰번호 (Phone Number)", 
+                                        "이메일 (Email)", "주소 (Address)", "아이디 (User ID)", "가입일 (Registration Date)", "고객 세그먼트 (Customer Segment)",
+                                        "차량구분(vehicle types)", "구매한 제품 (Purchased Product)", "제품 구매 날짜 (Purchase Date)", 
+                                        "거래 금액 (Transaction Amount)", "거래 방식 (Transaction Method)", 
+                                        "제품 구매 빈도 (Purchase Frequency)", "제품 구매 경로 (Purchase Path)", 
+                                        "제품 출시년월 (Launch Date)", "Cluster"])
 
         # 고객 데이터를 CSV 파일에 추가
         file_path = '/Users/marurun66/Documents/GitHub/customer_mini/클러스터링고객데이터_2.csv'
