@@ -140,7 +140,7 @@ def run_input_customer_info():
     거래금액_한글 = number_to_korean(int(거래금액))
     st.write(f"입력하신 금액: {거래금액_한글}")
 
-    구매빈도 = st.number_input("제품 구매 빈도 입력", min_value=0, step=1, key="purchase_frequency_input")
+    구매빈도 = st.number_input("제품 구매 빈도 입력", min_value=1, step=1, key="purchase_frequency_input")
     차량구분 = st.selectbox("차량 구분 선택", ["준중형 세단", "중형 세단", "대형 세단", "SUV", "픽업트럭"], key="vehicle_type_select")
     거래방식 = st.selectbox("거래 방식 선택", ["카드", "현금", "계좌이체"], key="transaction_method_select")
     구매경로 = st.selectbox("구매 경로 선택", ["온라인", "오프라인"], key="purchase_path_select")

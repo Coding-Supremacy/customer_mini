@@ -1,11 +1,9 @@
-.streamlit/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
-
-.ipynb
+.toml
 김예슬개인/
 
 # C extensions
