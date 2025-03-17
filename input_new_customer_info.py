@@ -58,13 +58,6 @@ def run_input_customer_info():
     휴대폰번호 = st.text_input("휴대폰 번호 입력", key="phone_input")
     # 하이픈을 포함한 휴대폰 번호 포맷팅
     휴대폰번호 = re.sub(r'[^0-9]', '', 휴대폰번호)  # 숫자만 추출
-    # 휴대폰 번호가 11자리인지 확인
-    if len(휴대폰번호) != 11:
-        st.error("휴대폰 번호는 11자리 숫자여야 합니다.")
-        return
-    # 하이픈 추가 (010-xxxx-xxxx 형식으로 변환)
-    휴대폰번호_포맷 = f"{휴대폰번호[:3]}-{휴대폰번호[3:7]}-{휴대폰번호[7:]}"
-
 
     이메일 = st.text_input("이메일 입력", key="email_input")
     주소 = st.text_input("주소 입력", key="address_input")
@@ -114,6 +107,13 @@ def run_input_customer_info():
     if '@' not in 이메일:
         st.error("이메일에 '@' 문자가 포함되어야 합니다.")
         return
+    
+        # 휴대폰 번호가 11자리인지 확인
+    if len(휴대폰번호) != 11:
+        st.error("휴대폰 번호는 11자리 숫자여야 합니다.")
+        return
+    # 하이픈 추가 (010-xxxx-xxxx 형식으로 변환)
+    휴대폰번호_포맷 = f"{휴대폰번호[:3]}-{휴대폰번호[3:7]}-{휴대폰번호[7:]}"
 
     # 모델에 맞는 컬럼만 사용하여 입력 데이터 준비
     if st.button("예측하기"):
@@ -139,7 +139,7 @@ def run_input_customer_info():
         # 모든 입력된 고객 정보를 포함하여 데이터 저장
         # 고객 정보를 포함한 데이터프레임 생성
         full_data = pd.DataFrame([[이름, 생년월일, 연령, 성별, 휴대폰번호_포맷, 이메일, 주소, 아이디, 가입일, 고객세그먼트, 차량구분, 구매한제품, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 구매경로, 제품출시년월, cluster_id]],
-                                columns=["이름 (Name)", "생년월일 (Date of Birth)","연령", "성별 (Gender)", "휴대폰번호 (Phone Number)", 
+                                columns=["이름 (Name)", "생년월일 (Date of Birth)","연령" "성별 (Gender)", "휴대폰번호 (Phone Number)", 
                                         "이메일 (Email)", "주소 (Address)", "아이디 (User ID)", "가입일 (Registration Date)", "고객 세그먼트 (Customer Segment)",
                                         "차량구분(vehicle types)", "구매한 제품 (Purchased Product)", "제품 구매 날짜 (Purchase Date)", 
                                         "거래 금액 (Transaction Amount)", "거래 방식 (Transaction Method)", 
