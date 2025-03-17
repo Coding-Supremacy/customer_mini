@@ -7,6 +7,10 @@ from num2words import num2words
 import requests
 import base64
 
+
+# secrets.toml에서 client_id와 client_secret 불러오기
+client_id = st.secrets["KAKAO"]["client_id"]
+redirect_uri = st.secrets["KAKAO"]["redirect_uri"]
 # 클러스터 ID에 대한 설명
 cluster_description = {
     0: ("고연령층 세단 구매 고객", "50대 후반, 준중형 세단 선호, 카드 결제, 거래 금액 높음,주로 VIP 고객"),
@@ -44,18 +48,23 @@ def number_to_korean(num):
 
 # 카카오 로그인 URL 생성
 def create_kakao_login_url():
-    KAKAO_CLIENT_ID = "8e31106f3f70372239cbabeeef99fd70"  # 카카오 개발자 센터에서 발급받은 앱 키
-    REDIRECT_URI = "http://localhost:8501"  # 리디렉션 URI
+    KAKAO_CLIENT_ID = client_id
+    REDIRECT_URI = redirect_uri  # 리디렉션 URI
     KAKAO_AUTH_URL = f"https://kauth.kakao.com/oauth/authorize?response_type=code&client_id={KAKAO_CLIENT_ID}&redirect_uri={REDIRECT_URI}"
     return KAKAO_AUTH_URL
 
 # 카카오 OAuth 인증 코드로 액세스 토큰을 얻는 함수
+#앱 키 secret.toml에서 가져오기
+
+
 def get_access_token_from_kakao(code):
     url = "https://kauth.kakao.com/oauth/token"
+
+
     data = {
         "grant_type": "authorization_code",
-        "client_id": "YOUR_CLIENT_ID",  # 카카오 개발자 센터에서 받은 앱 키
-        "redirect_uri": "http://localhost:8501",  # 리디렉션 URI
+        "client_id": client_id,  # 카카오 개발자 센터에서 받은 앱 키
+        "redirect_uri": redirect_uri,  # 리디렉션 URI
         "code": code
     }
     response = requests.post(url, data=data)
@@ -218,7 +227,7 @@ def run_input_customer_info():
 
         # 수신자 번호 및 메시지 내용
         to_number = "+82" + 휴대폰번호[1:]
-        message_body = f"안녕하세요! 고객님을 환영합니다. 예측된 클러스터: {cluster_id}, 고객 유형: {customer_type}"
+        message_body = f"안녕하세요! 고객님을 환영합니다. 예측된 클러스터: {cluster_id}, 고객 유형: {customer_type},카카오톡 채널 추가 : http://pf.kakao.com/_lkVXn"
 
         # API 요청 URL 및 헤더 설정
         url = "https://rest.clicksend.com/v3/sms/send"
