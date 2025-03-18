@@ -11,7 +11,6 @@ import promo_email
 
 
 
-
 # # secrets.toml에서 client_id와 client_secret 불러오기
 # client_id = st.secrets["KAKAO"]["client_id"]
 # redirect_uri = st.secrets["KAKAO"]["redirect_uri"]
@@ -116,7 +115,7 @@ def run_input_customer_info():
     
 
     # 모델 로드
-    model = joblib.load("junghee/model2.pkl")
+    model = joblib.load("junghee/model3.pkl")
 
     # 입력 폼 생성
     st.header("데이터 입력")
