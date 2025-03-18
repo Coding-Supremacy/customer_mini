@@ -1,4 +1,4 @@
-이름 (Name),생년월일 (Date of Birth),연령,성별 (Gender),휴대폰번호 (Phone Number),이메일 (Email),주소 (Address),아이디 (User ID),가입일 (Registration Date),고객 세그먼트 (Customer Segment),차량구분(vehicle types),구매한 제품 (Purchased Product),친환경차,제품 구매 날짜 (Purchase Date),거래 금액 (Transaction Amount),거래 방식 (Transaction Method),제품 구매 빈도 (Purchase Frequency),제품 구매 경로 (Purchase Path),제품 출시년월 (Launch Date),Cluster
+이름,생년월일,연령,성별,휴대폰번호,이메일,주소,아이디,가입일,고객 세그먼트,차량구분,구매한 제품,친환경차,제품 구매 날짜,거래 금액,거래 방식,제품 구매 빈도,제품 구매 경로,제품 출시년월,Cluster
 강주온,2002-03-04,23,남,01065028753,janisi@himedia.co.kr,인천광역시 남동구 구월동 88-10,14798,2023-04-01,일반,준중형 세단,Avante (CN7 N),부,2024-04-04,35170000,카드,1,오프라인,2020-05,6
 김경수,1983-01-02,42,남,01011112222,kimkyoungsoo31@himedia.co.kr,광주광역시 서구 치평동 14-7,kyoungsoo031,2025-02-09,vip,준대형 세단,G80 (RG3),부,2025-02-10,85790000,카드,5,오프라인,2020-03,0
 김다은,1999-05-02,26,여,01067890123,kimdaeun26@himedia.co.kr,부산광역시 해운대구 우동 101-12,daeun026,2025-02-28,신규,중형 suv,NEXO (FE),여,2025-03-10,69500000,현금,1,오프라인,2018-01,3
