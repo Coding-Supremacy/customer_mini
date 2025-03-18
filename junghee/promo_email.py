@@ -2,6 +2,7 @@ import base64
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import re
 import smtplib
 
 import pandas as pd
@@ -15,19 +16,24 @@ EMAIL_ADDRESS = "qhrehlwl111@gmail.com"
 EMAIL_PASSWORD = "nyaw spns mndv gsnb"  # 보안 강화를 위해 앱 비밀번호 사용
 
 # 프로모션 이메일 내용 불러오기
-df = pd.read_csv('junghee/클러스터링별_이메일_UTF8.csv')
+df = pd.read_csv('D:\junghee\GitHub\customer_mini\junghee\클러스터링_이메일_수정.csv')
+
+# **굵은 글씨** → <b>굵은 글씨</b> 변환 함수
+def convert_markdown_to_html(text):
+    return re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text)
 
 # 클러스터 그룹별 랜덤 이메일 선택 함수
 def get_random_email_content(cluster_id):
     # 클러스터 ID에 해당하는 이메일 본문과 제목을 랜덤하게 선택하여 반환
 
+    df["Email Content"] = df["Email Content"].apply(convert_markdown_to_html)
     # 해당 클러스터 ID의 데이터 필터링
-    cluster_emails = df[df["클러스터 ID"] == cluster_id][["이메일 본문", "제목"]]
+    cluster_emails = df[df["Cluster ID"] == cluster_id][["Email Content", "Subject"]]
 
     if not cluster_emails.empty:
         # 랜덤으로 하나 선택
         selected_email = cluster_emails.sample(n=1).iloc[0]
-        return selected_email["이메일 본문"], selected_email["제목"]
+        return selected_email["Email Content"], selected_email["Subject"]
     else:
         return "맞춤 프로모션 정보를 찾을 수 없습니다.", "제목 없음"
 

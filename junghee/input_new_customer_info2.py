@@ -111,29 +111,31 @@ def number_to_korean(num):
 
 def run_input_customer_info():
     # 고객 개인정보 입력.
-    st.title('고객 정보 입력')
+    st.title('📋 고객 정보 입력')
     
 
     # 모델 로드
     model = joblib.load("junghee/model3.pkl")
 
     # 입력 폼 생성
-    st.header("데이터 입력")
-    st.write("고객 정보를 입력하고 예측 버튼을 눌러주세요.")
+    st.info("""
+            #### 고객 정보를 입력하고 예측 버튼을 눌러주세요.
+            #### 모든 항목은 필수입니다.
+            """)
     
     with st.form(key="customer_info_form"):
         # 사용자 입력 받기 (각각의 입력창에 고유한 key 지정)
         col1, col2 = st.columns([1, 1])
         with col1:
-            이름 = st.text_input("이름 입력", key="name_input")
+            이름 = st.text_input("이름 입력", placeholder="필수입니다.", key="name_input")
             성별 = st.selectbox("성별 선택", ["남", "여"], key="gender_select")
-            휴대폰번호 = st.text_input("휴대폰 번호 입력", key="phone_input")
+            휴대폰번호 = st.text_input("휴대폰 번호 입력", placeholder="필수입니다.", key="phone_input")
             # 하이픈을 포함한 휴대폰 번호 포맷팅
             휴대폰번호 = re.sub(r'[^0-9]', '', 휴대폰번호)  # 숫자만 추출
 
-            이메일 = st.text_input("이메일 입력", key="email_input")
-            주소 = st.text_input("주소 입력", key="address_input")
-            아이디 = st.text_input("아이디 입력", key="id_input")
+            이메일 = st.text_input("이메일 입력", placeholder="필수입니다.", key="email_input")
+            주소 = st.text_input("주소 입력", placeholder="필수입니다.", key="address_input")
+            아이디 = st.text_input("아이디 입력", placeholder="필수입니다.", key="id_input")
             가입일 = st.date_input("가입일 입력", min_value=datetime(1900, 1, 1), key="registration_date_input")
             
 
@@ -176,14 +178,7 @@ def run_input_customer_info():
             if 제품출시년월:
                 st.text(f"선택하신 모델의 출시 년월: {제품출시년월}")
 
-            # 이메일 검사 (@ 포함 여부 확인)
-            if '@' not in 이메일:
-                st.error("이메일에 '@' 문자가 포함되어야 합니다.")
-                
             
-            # 휴대폰 번호가 11자리인지 확인
-            if len(휴대폰번호) != 11:
-                st.error("휴대폰 번호는 11자리 숫자여야 합니다.")
                 
         
             
@@ -191,90 +186,106 @@ def run_input_customer_info():
         submitted = st.form_submit_button("예측하기")
         # 모델에 맞는 컬럼만 사용하여 입력 데이터 준비
         if submitted:
-            # 필요한 컬럼만 포함된 데이터프레임 생성
-            input_data = pd.DataFrame([[연령, 거래금액, 구매빈도, 성별, 차량구분, 거래방식, 제품출시년월, 제품구매날짜, 고객세그먼트]],
-                                    columns=["연령", "거래 금액 (Transaction Amount)", "제품 구매 빈도 (Purchase Frequency)", 
-                                            "성별 (Gender)", "차량구분(vehicle types)", "거래 방식 (Transaction Method)", 
-                                            "제품 출시년월 (Launch Date)", "제품 구매 날짜 (Purchase Date)", "고객 세그먼트 (Customer Segment)"])
 
-            # 예측 실행
-            prediction = model.predict(input_data)
-            
-            # 예측된 클러스터 ID에 따른 고객 유형 및 특징 출력
-            cluster_id = prediction[0]
-            customer_type, characteristics = cluster_description.get(cluster_id, ("알 수 없는 클러스터", "특징 정보 없음"))
-            
-            st.text(f"예측된 클러스터: {cluster_id}")
-            st.text(f"고객 유형: {customer_type}")
-            st.text(f"특징: {characteristics}")
-            # # 예측 후 카카오톡 메시지 전송 (액세스 토큰 필요)
-            # access_token = "YOUR_ACCESS_TOKEN"  # 카카오 로그인 후 얻은 액세스 토큰
+            if not 이름 or not 휴대폰번호 or not 이메일 or not 주소 or not 아이디:
+                st.error("⚠️ 모든 항목을 입력해야 합니다!")
+            else:
+                           
 
-            # if access_token:
-            #     send_kakao_message_to_customer(access_token)
+                # 필요한 컬럼만 포함된 데이터프레임 생성
+                input_data = pd.DataFrame([[연령, 거래금액, 구매빈도, 성별, 차량구분, 거래방식, 제품출시년월, 제품구매날짜, 고객세그먼트]],
+                                        columns=["연령", "거래 금액 (Transaction Amount)", "제품 구매 빈도 (Purchase Frequency)", 
+                                                "성별 (Gender)", "차량구분(vehicle types)", "거래 방식 (Transaction Method)", 
+                                                "제품 출시년월 (Launch Date)", "제품 구매 날짜 (Purchase Date)", "고객 세그먼트 (Customer Segment)"])
 
-            # 클러스터링 결과와 고객 정보를 데이터프레임에 추가 (전체 고객 정보도 포함)
-            input_data["Cluster"] = cluster_id
-            # 모든 입력된 고객 정보를 포함하여 데이터 저장
-            # 고객 정보를 포함한 데이터프레임 생성
-            full_data = pd.DataFrame([[이름, 생년월일, 연령, 성별, 휴대폰번호, 이메일, 주소, 아이디, 가입일, 고객세그먼트, 차량구분, 구매한제품, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 구매경로, 제품출시년월, cluster_id]],
-                                    columns=["이름 (Name)", "생년월일 (Date of Birth)","연령", "성별 (Gender)", "휴대폰번호 (Phone Number)", 
-                                            "이메일 (Email)", "주소 (Address)", "아이디 (User ID)", "가입일 (Registration Date)", "고객 세그먼트 (Customer Segment)",
-                                            "차량구분(vehicle types)", "구매한 제품 (Purchased Product)", "제품 구매 날짜 (Purchase Date)", 
-                                            "거래 금액 (Transaction Amount)", "거래 방식 (Transaction Method)", 
-                                            "제품 구매 빈도 (Purchase Frequency)", "제품 구매 경로 (Purchase Path)", 
-                                            "제품 출시년월 (Launch Date)", "Cluster"])
-
-            # 고객 데이터를 CSV 파일에 추가
-            file_path = '클러스터링고객데이터_2.csv'
-            file_exists = pd.io.common.file_exists(file_path)
-
-            # 데이터 저장
-            full_data.to_csv(file_path, mode='a', header=not file_exists, index=False)
-            st.text(f"고객 정보가 {file_path}에 저장되었습니다.")
-            print(f"파일 저장 위치: {file_path}")
-
-            # ClickSend API를 사용하여 SMS 보내기
-            clicksend_username = st.secrets["CLICKSEND"]["CLICKSEND_USERNAME"]  # ClickSend 계정 사용자 이름
-            clicksend_api_key = st.secrets["CLICKSEND"]["CLICKSEND_API_KEY"]    # ClickSend API 키
-
-            # 수신자 번호 및 메시지 내용
-            to_number = "+82" + 휴대폰번호[1:]
-            message_body = f"안녕하세요! 고객님을 환영합니다. 예측된 클러스터: {cluster_id}, 고객 유형: {customer_type}"
-
-            # API 요청 URL 및 헤더 설정
-            url = "https://rest.clicksend.com/v3/sms/send"
-            auth_header = f"Basic {base64.b64encode(f'{clicksend_username}:{clicksend_api_key}'.encode()).decode()}"
-
-            headers = {
-                "Authorization": auth_header,
-                "Content-Type": "application/json"
-            }
-
-            # 요청 데이터
-            data = {
-                "messages": [
-                    {
-                        "source": "sdk",
-                        "body": message_body,
-                        "to": to_number
-                    }
-                ]
-            }
-
-            try:
-                response = requests.post(url, headers=headers, json=data)
-                print("Message sent successfully:", response.json())
-            except Exception as e:
-                print("Error sending SMS:", e)
+                # 이메일 검사 (@ 포함 여부 확인)
+                if '@' not in 이메일:
+                    st.error("이메일에 '@' 문자가 포함되어야 합니다.")
+                    
+                
+                # 휴대폰 번호가 11자리인지 확인
+                if len(휴대폰번호) != 11:
+                    st.error("휴대폰 번호는 11자리 숫자여야 합니다.")
 
 
-            # 이메일 발송
-            promo_email.send_promotion_email(이메일, 이름, cluster_id)
+                # 예측 실행
+                prediction = model.predict(input_data)
+                
+                # 예측된 클러스터 ID에 따른 고객 유형 및 특징 출력
+                cluster_id = prediction[0]
+                customer_type, characteristics = cluster_description.get(cluster_id, ("알 수 없는 클러스터", "특징 정보 없음"))
+                
+                st.text(f"예측된 클러스터: {cluster_id}")
+                st.text(f"고객 유형: {customer_type}")
+                st.text(f"특징: {characteristics}")
+                # # 예측 후 카카오톡 메시지 전송 (액세스 토큰 필요)
+                # access_token = "YOUR_ACCESS_TOKEN"  # 카카오 로그인 후 얻은 액세스 토큰
 
-            with st.spinner("이메일 발송 중.."):
-                time.sleep(3)
-                st.success("이메일이 성공적으로 발송되었습니다.")
-    
+                # if access_token:
+                #     send_kakao_message_to_customer(access_token)
+
+                # 클러스터링 결과와 고객 정보를 데이터프레임에 추가 (전체 고객 정보도 포함)
+                input_data["Cluster"] = cluster_id
+                # 모든 입력된 고객 정보를 포함하여 데이터 저장
+                # 고객 정보를 포함한 데이터프레임 생성
+                full_data = pd.DataFrame([[이름, 생년월일, 연령, 성별, 휴대폰번호, 이메일, 주소, 아이디, 가입일, 고객세그먼트, 차량구분, 구매한제품, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 구매경로, 제품출시년월, cluster_id]],
+                                        columns=["이름 (Name)", "생년월일 (Date of Birth)","연령", "성별 (Gender)", "휴대폰번호 (Phone Number)", 
+                                                "이메일 (Email)", "주소 (Address)", "아이디 (User ID)", "가입일 (Registration Date)", "고객 세그먼트 (Customer Segment)",
+                                                "차량구분(vehicle types)", "구매한 제품 (Purchased Product)", "제품 구매 날짜 (Purchase Date)", 
+                                                "거래 금액 (Transaction Amount)", "거래 방식 (Transaction Method)", 
+                                                "제품 구매 빈도 (Purchase Frequency)", "제품 구매 경로 (Purchase Path)", 
+                                                "제품 출시년월 (Launch Date)", "Cluster"])
+
+                # 고객 데이터를 CSV 파일에 추가
+                file_path = 'D:\junghee\GitHub\customer_mini\yeseul\클러스터링고객데이터_2.csv'
+                file_exists = pd.io.common.file_exists(file_path)
+
+                # 데이터 저장
+                full_data.to_csv(file_path, mode='a', header=not file_exists, index=False)
+                st.text(f"고객 정보가 {file_path}에 저장되었습니다.")
+                print(f"파일 저장 위치: {file_path}")
+
+                # ClickSend API를 사용하여 SMS 보내기
+                clicksend_username = st.secrets["CLICKSEND"]["CLICKSEND_USERNAME"]  # ClickSend 계정 사용자 이름
+                clicksend_api_key = st.secrets["CLICKSEND"]["CLICKSEND_API_KEY"]    # ClickSend API 키
+
+                # 수신자 번호 및 메시지 내용
+                to_number = "+82" + 휴대폰번호[1:]
+                message_body = f"안녕하세요! 고객님을 환영합니다. 예측된 클러스터: {cluster_id}, 고객 유형: {customer_type}"
+
+                # API 요청 URL 및 헤더 설정
+                url = "https://rest.clicksend.com/v3/sms/send"
+                auth_header = f"Basic {base64.b64encode(f'{clicksend_username}:{clicksend_api_key}'.encode()).decode()}"
+
+                headers = {
+                    "Authorization": auth_header,
+                    "Content-Type": "application/json"
+                }
+
+                # 요청 데이터
+                data = {
+                    "messages": [
+                        {
+                            "source": "sdk",
+                            "body": message_body,
+                            "to": to_number
+                        }
+                    ]
+                }
+
+                try:
+                    response = requests.post(url, headers=headers, json=data)
+                    print("Message sent successfully:", response.json())
+                except Exception as e:
+                    print("Error sending SMS:", e)
+
+
+                # 이메일 발송
+                promo_email.send_promotion_email(이메일, 이름, cluster_id)
+
+                with st.spinner("이메일 발송 중.."):
+                    time.sleep(3)
+                    st.success("이메일이 성공적으로 발송되었습니다.")
+        
 
 

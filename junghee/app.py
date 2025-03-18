@@ -6,68 +6,44 @@ from streamlit_option_menu import option_menu
 
 
 from home import run_home
-from input_new_customer_info2 import run_input_customer_info
+from input_new_customer_info import run_input_customer_info
 import os
 
 from description import run_description
 from eda import run_eda
 
-st.set_page_config(page_title="Dog Info App", layout="wide")
-    
+# 페이지 설정
+st.set_page_config(page_title="🚗 고객 클러스터링 & 맞춤형 프로모션 시스템", layout="wide")
+
+
 st.markdown(
     """
     <style>
-    /* 버튼 기본 스타일 */
-        div.stButton > button {
-            background-color: #FFCC80; /* 파스텔톤 주황 */
-            color: #5A3E36; /* 부드러운 갈색 (텍스트) */
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 10px;
-            padding: 12px 24px;
-            border: none;
-            transition: all 0.3s ease-in-out;
-        }
+    /* 배경색 설정 */
+            .stApp {
+                background-color: #ffffff; 
+            }
+            /* 컨텐츠 정렬 */
+            .block-container {
+                max-width: 1100px; /* 중앙 정렬을 위한 최대 너비 */
+                margin: auto;
+                padding: 2rem;
+                border-radius: 10px;
+                background-color: #ffffff; 
+                box-shadow: 2px 2px 10px rgba(0,0,0,0.2); /* 살짝 그림자 효과 */
+            }
 
-        /* 버튼 마우스 호버 효과 */
-        div.stButton > button:hover {
-            background-color: #FFB74D; /* 살짝 진한 주황 */
-            transform: scale(1.05);
-            box-shadow: 0px 4px 10px rgba(255, 179, 71, 0.3);
-        }
-
-        /* 버튼 클릭 효과 */
-        div.stButton > button:active {
-            background-color: #FFA726; /* 더 진한 주황 */
-            transform: scale(0.98);
-        }
-        /* 배경색 설정 */
-        .stApp {
-            background-color: #ffffff; 
-        }
-        /* 컨텐츠 정렬 */
-        .block-container {
-            max-width: 1100px; /* 중앙 정렬을 위한 최대 너비 */
-            margin: auto;
-            padding: 2rem;
-            border-radius: 10px;
-            background-color: #F8F9FA; /* 컨텐츠 부분만 흰색 */
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.1); /* 살짝 그림자 효과 */
-        }
-
-        /* 제목 스타일 */
-        h1, h2, h3 {
-            color: #343a40; /* 다크 그레이 */
-        }
+            /* 제목 스타일 */
+            h1, h2, h3 {
+                color: #343a40; /* 다크 그레이 */
+            }
     </style>
-    """,
-    unsafe_allow_html=True
+    """, unsafe_allow_html=True
 )
+
 def run_app():
 
-    
-
-    # 📌 CSS 적용하여 좌우 여백 추가 (최대 너비 조정)
+        
     
 
     menu = ['홈', '개발 과정', '고객정보 입력', 'EDA', 'Predict', 'About']
@@ -88,9 +64,6 @@ def run_app():
     if selected == 'EDA' :
         run_eda()
      
-    
-        
-
     
     
     
