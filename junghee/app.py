@@ -4,8 +4,10 @@ import numpy as np
 import joblib 
 from streamlit_option_menu import option_menu
 
-from ui.home import run_home
-from ui.input_new_customer_info2 import run_input_customer_info
+
+from home import run_home
+from input_new_customer_info2 import run_input_customer_info
+import os
 
 
 
@@ -21,11 +23,11 @@ def run_app():
             icons=['house'], menu_icon="cast", default_index=1)
         
     if selected == '홈':
-        run_home()
+        pass
        
     if selected == '고객정보 입력':
         run_input_customer_info() 
-        
+     
         
         
 
