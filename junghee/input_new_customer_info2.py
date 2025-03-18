@@ -7,7 +7,7 @@ from num2words import num2words
 import requests
 import base64
 import time
-from junghee import promo_email
+import promo_email
 
 
 
@@ -180,12 +180,12 @@ def run_input_customer_info():
             # 이메일 검사 (@ 포함 여부 확인)
             if '@' not in 이메일:
                 st.error("이메일에 '@' 문자가 포함되어야 합니다.")
-                st.stop()
+                
             
             # 휴대폰 번호가 11자리인지 확인
             if len(휴대폰번호) != 11:
                 st.error("휴대폰 번호는 11자리 숫자여야 합니다.")
-                st.stop()
+                
         
             
         # ✅ 폼 내에서 버튼 추가 (버튼이 보이지 않는 문제 해결됨!)

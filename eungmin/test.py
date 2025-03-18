@@ -218,8 +218,7 @@ def run_test():
 
         # 수신자 번호 및 메시지 내용
         to_number = "+82" + 휴대폰번호[1:]
-        message_body = f"안녕하세요! 고객님을 환영합니다. 예측된 클러스터: {cluster_id}, 고객 유형: {customer_type}"
-
+        message_body = f"안녕하세요, {이름}님! 현대 자동차에서 보내드리는 메시지입니다. 멤버십 가입을 축하드리며, 다양한 혜택과 서비스를 경험해보세요!"
         # API 요청 URL 및 헤더 설정
         url = "https://rest.clicksend.com/v3/sms/send"
         auth_header = f"Basic {base64.b64encode(f'{clicksend_username}:{clicksend_api_key}'.encode()).decode()}"
