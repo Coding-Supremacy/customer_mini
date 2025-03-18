@@ -4,109 +4,109 @@ import pandas as pd
 from streamlit_option_menu import option_menu
 
 def run_eda():
-    # 페이지 설정
-    st.set_page_config(page_title="🚗 현대자동차 고객 분석 대시보드", layout="wide")
-    
+
+    # st.set_page_config(page_title="🚗 현대자동차 고객 분석 대시보드", layout="wide")
+
     # 추가 CSS 디자인: 구글 폰트, 애니메이션, 배경 그라데이션, 컨테이너, 탭 콘텐츠, 분석 카드 등
-    st.markdown(
-        """
-        <style>
-        /* 구글 폰트 로드 */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+    # st.markdown(
+    #     """
+    #     <style>
+    #     /* 구글 폰트 로드 */
+    #     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
         
-        /* 전체 body 스타일 */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #f0f4f8, #e8f5e9);
-            padding: 20px;
-        }
+    #     /* 전체 body 스타일 */
+    #     body {
+    #         font-family: 'Roboto', sans-serif;
+    #         background: linear-gradient(135deg, #f0f4f8, #e8f5e9);
+    #         padding: 20px;
+    #     }
 
-        /* Streamlit 기본 배경 제거 */
-        .css-18e3th9, .css-1d391kg {
-            background: none;
-        }
+    #     /* Streamlit 기본 배경 제거 */
+    #     .css-18e3th9, .css-1d391kg {
+    #         background: none;
+    #     }
         
-        /* 메인 컨테이너 스타일 */
-        .reportview-container .main {
-            background-color: rgba(255,255,255,0.9);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        }
+    #     /* 메인 컨테이너 스타일 */
+    #     .reportview-container .main {
+    #         background-color: rgba(255,255,255,0.9);
+    #         padding: 40px;
+    #         border-radius: 15px;
+    #         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    #     }
 
-        /* 헤더 스타일 */
-        h1 {
-            font-size: 2.5em;
-            font-weight: 700;
-            text-align: center;
-            color: #2E86C1;
-            margin-bottom: 10px;
-        }
+    #     /* 헤더 스타일 */
+    #     h1 {
+    #         font-size: 2.5em;
+    #         font-weight: 700;
+    #         text-align: center;
+    #         color: #2E86C1;
+    #         margin-bottom: 10px;
+    #     }
 
-        h4 {
-            text-align: center;
-            color: #555;
-            margin-bottom: 30px;
-            font-size: 1.1em;
-        }
+    #     h4 {
+    #         text-align: center;
+    #         color: #555;
+    #         margin-bottom: 30px;
+    #         font-size: 1.1em;
+    #     }
         
-        hr {
-            border: 1px solid #bbb;
-            margin: 20px 0;
-        }
+    #     hr {
+    #         border: 1px solid #bbb;
+    #         margin: 20px 0;
+    #     }
         
-        /* 옵션 메뉴 스타일 */
-        .nav-link {
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            border-radius: 10px;
-        }
+    #     /* 옵션 메뉴 스타일 */
+    #     .nav-link {
+    #         transition: background-color 0.3s ease, transform 0.3s ease;
+    #         border-radius: 10px;
+    #     }
 
-        .nav-link:hover {
-            background-color: #AED6F1 !important;
-            transform: scale(1.05);
-        }
+    #     .nav-link:hover {
+    #         background-color: #AED6F1 !important;
+    #         transform: scale(1.05);
+    #     }
         
-        /* 분석 텍스트 카드 스타일 */
-        .analysis-text {
-            background-color: #ffffff;
-            border-left: 4px solid #2E86C1;
-            padding: 20px;
-            margin: 30px 0;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            font-size: 1.1em;
-            color: #333;
-            line-height: 1.5;
-        }
+    #     /* 분석 텍스트 카드 스타일 */
+    #     .analysis-text {
+    #         background-color: #ffffff;
+    #         border-left: 4px solid #2E86C1;
+    #         padding: 20px;
+    #         margin: 30px 0;
+    #         border-radius: 8px;
+    #         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    #         font-size: 1.1em;
+    #         color: #333;
+    #         line-height: 1.5;
+    #     }
         
-        .analysis-text:hover {
-            background-color: #f7f9fa;
-        }
+    #     .analysis-text:hover {
+    #         background-color: #f7f9fa;
+    #     }
 
-        /* 탭 콘텐츠 스타일 */
-        .tab-content {
-            background-color: #fefefe;
-            padding: 30px;
-            border-radius: 15px;
-            margin-top: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
+    #     /* 탭 콘텐츠 스타일 */
+    #     .tab-content {
+    #         background-color: #fefefe;
+    #         padding: 30px;
+    #         border-radius: 15px;
+    #         margin-top: 20px;
+    #         box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    #     }
         
-        /* 이미지 스타일 */
-        img {
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            max-width: 100%;
-        }
+    #     /* 이미지 스타일 */
+    #     img {
+    #         border-radius: 12px;
+    #         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    #         max-width: 100%;
+    #     }
 
-        /* 옵션 메뉴 스타일 */
-        .option-menu .nav-link-selected {
-            background-color: #2E86C1;
-            color: white;
-        }
-        </style>
-        """, unsafe_allow_html=True
-    )
+    #     /* 옵션 메뉴 스타일 */
+    #     .option-menu .nav-link-selected {
+    #         background-color: #2E86C1;
+    #         color: white;
+    #     }
+    #     </style>
+    #     """, unsafe_allow_html=True
+    # )
     
     # 메인 헤더
     st.markdown("""
@@ -141,7 +141,7 @@ def run_eda():
         - 특정 연도에 가입한 고객들이 어떤 세그먼트에 속하는지 파악하여 타겟 마케팅을 설계할 수 있습니다.
         - 또한, 연도별 고객 유입 트렌드를 분석하여 향후 고객 이탈을 방지하는 전략을 개발하는 데 도움을 줍니다.
         """)
-        image_path = "cluster_analysis/image/가입연도와 고객 세그먼트 관계.png"
+        image_path = "C:/customer_mini/cluster_analysis/image/가입연도와 고객 세그먼트 관계.png"
         if os.path.exists(image_path):
             st.image(image_path)
             st.markdown("""
@@ -166,7 +166,7 @@ def run_eda():
         - VIP 고객과 일반 고객군의 소비 차이를 파악하여 차별화된 전략을 설계합니다.
         - 특정 세그먼트에서 거래 금액이 급격히 증가하는 시점을 파악하여 프로모션 효과성 분석을 할 수 있습니다.
         """)
-        image_path = "customer_segment/고객 세그먼트별 거래 금액 분포.png"
+        image_path = "C:/customer_mini/customer_segment/고객 세그먼트별 거래 금액 분포.png"
         if os.path.exists(image_path):
             st.image(image_path)
             st.markdown("""
@@ -191,7 +191,7 @@ def run_eda():
         - 구매 빈도가 낮은 고객을 대상으로 재구매율을 높이기 위한 마케팅 전략을 수립합니다.
         - 또한, 구매 빈도가 높은 고객을 분석하여 더 많은 혜택을 제공할 수 있습니다.
         """)
-        image_path = "customer_segment/구매빈도와 고객 세그먼트 관계.png"
+        image_path = "C:/customer_mini/customer_segment/구매빈도와 고객 세그먼트 관계.png"
         if os.path.exists(image_path):
             st.image(image_path)
             st.markdown("""
@@ -209,7 +209,7 @@ def run_eda():
     if selected == "📈 클러스터링 분석":
         st.markdown("<div class='tab-content'>", unsafe_allow_html=True)
         st.subheader("📈 클러스터별 고객 세그먼트 분석")
-        image_path = "cluster_analysis/image/클러스터별 고객 세그먼트 분포.png"
+        image_path = "C:/customer_mini/cluster_analysis/image/클러스터별 고객 세그먼트 분포.png"
         if os.path.exists(image_path):
             st.image(image_path)
         else:
@@ -230,3 +230,5 @@ def run_eda():
         """, unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
+if __name__ == "__main__":
+    run_eda()

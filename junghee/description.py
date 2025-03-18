@@ -102,7 +102,7 @@ launch_dates = {
 
     with col5:
         # 가입연도와 고객 세그먼트 관계 시각화
-        df1= pd.read_csv('/Users/marurun66/Documents/GitHub/customer_mini/data/고객데이터_가입연월.csv')
+        df1= pd.read_csv('D:\junghee\GitHub\customer_mini\data\고객데이터_가입연월.csv')
         df1['가입연도'] = df1['가입연도'].astype(int)
         # 그래프 그리기
         fig = px.histogram(df1, 
@@ -133,7 +133,7 @@ launch_dates = {
         그 외 신규세그먼트는 일반으로 변경 하였습니다.
         """, unsafe_allow_html=True)
     
-    pd.read_csv("클러스터링고객데이터_2.csv")
+    pd.read_csv("D:\junghee\GitHub\customer_mini\yeseul\클러스터링고객데이터_4.csv")
     st.markdown("""
 변경 후의 고객 세그먼트 분포  
                 """)
