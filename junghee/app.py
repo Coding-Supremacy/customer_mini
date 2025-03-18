@@ -19,7 +19,7 @@ st.set_page_config(page_title="🚗 고객 클러스터링 & 맞춤형 프로모
 st.markdown(
     """
     <style>
-    /* 배경색 설정 */
+        /* 배경색 설정 */
             .stApp {
                 background-color: #ffffff; 
             }
@@ -37,8 +37,10 @@ st.markdown(
             h1, h2, h3 {
                 color: #343a40; /* 다크 그레이 */
             }
+            
     </style>
-    """, unsafe_allow_html=True
+    """, 
+    unsafe_allow_html=True
 )
 
 def run_app():

@@ -8,8 +8,8 @@ def run_description():
     df1 = pd.read_csv('data/description1.csv')  # 전처리 데이터
     df2 = pd.read_csv("data/description2.csv")  # 전처리 완료 데이터 = 클러스터링고객데이터_4.csv
     st.subheader('원본 데이터 확인')
+    st.dataframe(df.head(),hide_index=True)
 
-    st.dataframe(df.head().style.hide(axis="index"))
     st.markdown("")
     st.markdown("---")
 
@@ -17,7 +17,7 @@ def run_description():
     col1, col2 = st.columns(2)
     with col1:
         vehicle_types = df.loc[df["구매한 제품 (Purchased Product)"] == "Avante (CN7 N)", ["구매한 제품 (Purchased Product)", "차량구분(vehicle types)"]]
-        st.dataframe(vehicle_types.style.hide(axis="index"))
+        st.dataframe(vehicle_types,hide_index=True)
     with col2:
         st.markdown("""<br><br><br><br>
                     샘플 데이터에서는 동일한 제품이라도 차량 구분이 다른 경우가 있었습니다.<br>
@@ -67,10 +67,10 @@ launch_dates = {
             {"Model": "Santa-Fe (MX5 PHEV)", "Type": "플러그인 하이브리드 (PHEV)"}
         ]
         eco_friendly_df = pd.DataFrame(eco_friendly_table)
-        st.dataframe(eco_friendly_df.style.hide(axis="index"))  # 인덱스 숨기기
+        st.dataframe(eco_friendly_df,hide_index=True)
     with col2:
-        df_ecoproduct = df2[['구매한 제품 (Purchased Product)', '친환경차']]
-        st.dataframe(df_ecoproduct.style.hide(axis="index"))
+        df_ecoproduct = df2[['구매한 제품', '친환경차']]
+        st.dataframe(df_ecoproduct,hide_index=True)
     st.markdown("""
 구매 모델 중 **FCEV, HEV, EV, PHEV 모델**은 친환경차로 분류하여 **친환경차를 선호하는 고객군**을 파악하고자 하였습니다.
                 
@@ -175,7 +175,7 @@ launch_dates = {
 
     with col2:
         # '고객 세그먼트 (Customer Segment)'의 value_counts 결과를 순서대로 맞추기
-        segment_counts2 = df2['고객 세그먼트 (Customer Segment)'].value_counts().reindex(category_order).fillna(0).astype(int)
+        segment_counts2 = df2['고객 세그먼트'].value_counts().reindex(category_order).fillna(0).astype(int)
 
         # 총 인원 수를 계산하여 '총 인원' 추가
         total_count2 = segment_counts2.sum()
@@ -191,11 +191,11 @@ launch_dates = {
     st.markdown("""고객 생년월일 데이터를 25년 3월 기준 연령으로 변환 하였습니다.""")
     merged_df = pd.concat([df['생년월일 (Date of Birth)'], df2['연령']], axis=1)
     merged_df.columns = ['원본파일의 생년월일 (Date of Birth)', '변환 후 연령']
-    st.dataframe(merged_df.style.hide(axis="index"))
+    st.dataframe(merged_df,hide_index=True)
 
     st.subheader('전처리 후 고객정보 데이터셋 📊')
-    df2['휴대폰번호 (Phone Number)'] = df2['휴대폰번호 (Phone Number)'].astype(str).apply(lambda x: '0' + x)
-    st.dataframe(df2.head().style.hide(axis="index"))
+    df2['휴대폰번호'] = df2['휴대폰번호'].astype(str).apply(lambda x: '0' + x)
+    st.dataframe(df2.head())
 
     st.markdown("---")
     st.title("KMeans 클러스터링 진행")
@@ -226,3 +226,7 @@ launch_dates = {
 엘보우 기법 분석 결과 클러스터 수를 8개로 선정하여 KMeans 클러스터링을 진행하였습니다.<br>
                     클러스터링 결과는 EDA페이지에서 확인할 수 있습니다.<br>
                     """, unsafe_allow_html=True)
+        
+
+if __name__ == "__main__":
+    run_description()
