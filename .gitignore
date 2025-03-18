@@ -4,9 +4,6 @@ __pycache__/
 *$py.class
 
 
-.ipynb
-김예슬개인/
-
 # C extensions
 *.so
 
