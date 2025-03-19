@@ -6,11 +6,12 @@ from streamlit_option_menu import option_menu
 
 
 from home import run_home
-from input_new_customer_info import run_input_customer_info
+
 import os
 
 from description import run_description
 from eda import run_eda
+from yeseul.input_new_customer_info import run_input_customer_info
 
 st.set_page_config(page_title="Dog Info App", layout="wide")
     

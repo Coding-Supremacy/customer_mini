@@ -1,4 +1,4 @@
-연령,거래 금액 (Transaction Amount),제품 구매 빈도 (Purchase Frequency),성별 (Gender),차량구분(vehicle types),거래 방식 (Transaction Method),제품 출시년월 (Launch Date),제품 구매 날짜 (Purchase Date),고객 세그먼트 (Customer Segment),친환경차,Cluster
+연령,거래 금액,제품 구매 빈도,성별,차량구분,거래 방식,제품 출시년월,제품 구매 날짜,고객 세그먼트,친환경차,Cluster
 23,35170000,1,남,준중형 세단,카드,2020-05,2024-04-04,일반,부,6
 42,85790000,5,남,준대형 세단,카드,2020-03,2025-02-10,vip,부,0
 26,69500000,1,여,중형 suv,현금,2018-01,2025-03-10,신규,여,3
