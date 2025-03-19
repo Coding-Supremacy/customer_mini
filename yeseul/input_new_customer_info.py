@@ -213,14 +213,14 @@ def step2_vehicle_selection():
         'G70 (IK)': 'img/g70.png',
         'Santa-Fe ™': 'img/santafe.png',
         'NEXO (FE)': 'img/NEXO.png',
-        'Avante (CN7 N)': 'img/Avante.png',
+        'Avante (CN7 N)': 'img/Avante (CN7 N).png',
         'G80 (RG3)': 'img/g80.png',
         'Grandeur (GN7 HEV)': 'img/Grandeur.png',
         'IONIQ (AE EV)': 'img/IONIQ.png',
         'i30 (PD)': 'img/i30.png',
         'Palisade (LX2)': 'img/PALISADE.png',
         'Tucson (NX4 PHEV)': 'img/TUCSON.png',
-        'Avante (CN7 HEV)': 'img/Avante (CN7 N).png',
+        'Avante (CN7 HEV)': 'img/Avante.png',
         'IONIQ 6 (CE)': 'img/IONIQ6.png',
         'G90 (HI)': 'img/G90.jpg',
         'Santa-Fe (MX5 PHEV)': 'img/Santa-FePHEV.png',
@@ -241,10 +241,9 @@ def step2_vehicle_selection():
         "G70 (IK)": "G70은 고급 세단으로, 가격대가 적당하면서도 고급스러운 느낌을 줄 수 있는 차량입니다. 세련된 디자인을 갖추고 있습니다.",
         "Palisade (LX2)": "Palisade는 넓고 고급스러운 3열 SUV로, 대가족이나 넉넉한 공간을 필요로 하는 고객님께 적합합니다. 높은 품질의 승차감을 제공합니다.",
         "Santa-Fe (MX5 PHEV)": "Santa-Fe PHEV는 플러그인 하이브리드 SUV로, 친환경을 고려하면서도 넓은 공간과 뛰어난 성능을 자랑하는 선택입니다.",
-        "G90 (RS4)": "G90 RS4는 프리미엄 브랜드의 대표 모델로, 최고급 세단에 걸맞은 품격과 편안함을 제공합니다. 세부 사항까지 완벽한 선택입니다."
+        "G90 (RS4)": "G90 RS4는 프리미엄 브랜드의 대표 모델로, 최고급 세단에 걸맞은 품격과 편안함을 제공합니다. 세부 사항까지 완벽한 선택입니다.",
+        "Avante (CN7 HEV)":"친환경차 선호도가 높은 고객님께 Avante (CN7 HEV)! 하이브리드 모델로 연비 효율성을 자랑하며, 친환경적인 선택을 제공합니다."
     }
-
-
 
     # 차량 링크 매핑
     vehicle_links = {
@@ -261,85 +260,76 @@ def step2_vehicle_selection():
         "G70 (IK)": "https://www.genesis.com/kr/ko/models/luxury-sedan-genesis/g70/highlights.html",
         "Palisade (LX2)": "https://www.hyundai.com/kr/ko/vehicles/palisade",
         "Santa-Fe (MX5 PHEV)": "https://www.hyundai.com/kr/ko/e/vehicles/santafe/intro",
-        "G90 (RS4)": "https://www.genesis.com/kr/ko/models/luxury-sedan-genesis/g90-black/highlights.html"
+        "G90 (RS4)": "https://www.genesis.com/kr/ko/models/luxury-sedan-genesis/g90-black/highlights.html",
+        "Avante (CN7 HEV)": "https://www.hyundai.com/kr/ko/e/vehicles/avante-n/intro"
     }
 
-
-    # 차량 가격 매핑 (000 단위로, , 없이)
+    # 차량 가격 매핑
     vehicle_prices = {
-        "Avante (CN7 N)": "19640000",
-        "NEXO (FE)": "69500000",
-        "Santa-Fe ™": "34920000",
-        "G80 (RG3)": "82750000",
-        "G90 (HI)": "129600000",
-        "IONIQ 6 (CE)": "46950000",  # 4,290만원
-        "i30 (PD)": "22000000",  # 2,200만원
-        "Tucson (NX4 PHEV)": "40500000",  # 4,050만원
-        "Grandeur (GN7 HEV)": "41500000",  # 4,150만원
-        "IONIQ (AE EV)": "32900000",  # 3,290만원
-        "G70 (IK)": "38500000",  # 3,850만원
-        "Palisade (LX2)": "52000000",  # 5,200만원
-        "Santa-Fe (MX5 PHEV)": "41500000",  # 4,150만원
-        "G90 (RS4)": "92000000"  # 9,200만원
+        "Avante (CN7 N)": "19640000","NEXO (FE)": "69500000","Santa-Fe ™": "34920000","G80 (RG3)": "82750000","G90 (HI)": "129600000","IONIQ 6 (CE)": "46950000","i30 (PD)": "25560000","Tucson (NX4 PHEV)": "27290000","Grandeur (GN7 HEV)": "37110000","IONIQ (AE EV)": "67150000","G70 (IK)": "45240000","Palisade (LX2)": "43830000","Santa-Fe (MX5 PHEV)": "34920000","G90 (RS4)": "135800000","Avante (CN7 HEV)": "33090000"
     }
-
-
 
     # 클러스터별 차량 추천 이유 매핑
     vehicle_recommendations = {
         "Avante (CN7 N)": {
-            0: "젊은 연령대와 높은 거래 금액을 자랑하는 고객님께 딱 맞는 트렌디한 선택, Avante (CN7 N)! 최신형 세단으로 스타일과 실용성 두 마리 토끼를 잡을 수 있는 완벽한 선택입니다. 이 차량으로 한 단계 더 업그레이드된 라이프스타일을 경험해 보세요.",
-            1: "VIP 고객님에게 어울리는 고급스러움을 제공하는 차량, Avante (CN7 N)! 고급 세단으로서 품격 있는 스타일을 완성해 드립니다. 더욱 럭셔리한 운전을 즐기세요.",
-            2: "가격 대비 성능 최고! Avante (CN7 N)은 경제적이면서도 뛰어난 성능을 자랑하는 차량입니다. 실용적이고 만족스러운 선택, 놓치지 마세요.",
-            3: "젊은 고객님, 스타일과 친환경성을 모두 고려한 Avante (CN7 N)! 최신 기술과 뛰어난 성능, 이 차량은 바로 여러분의 라이프스타일에 맞는 완벽한 파트너입니다.",
-            4: "이 차량은 친환경차 선호도가 높은 고객님께도 안성맞춤! 가격 대비 성능이 뛰어나며 실용성도 고려한 Avante (CN7 N), 이제 여러분의 차례입니다.",
-            5: "신뢰할 수 있는 차량, Avante (CN7 N)! 현금 거래 비율이 높은 고객님께는 안정감과 실용성까지 제공하는 세련된 선택이 될 거예요.",
-            6: "젊은 고객님들에게 더 없이 좋은 가격 대비 성능의 Avante (CN7 N)! 실용적이면서도 트렌디한 선택을 원하신다면 이 차가 바로 정답입니다.",
-            7: "친환경차를 선호하시는 고객님에게 더할 나위 없이 좋은 전기차 옵션까지 고려한 Avante (CN7 N), 이 차와 함께라면 환경을 생각하는 운전이 가능해요."
+            0: "젊은 연령대와 높은 거래 금액을 자랑하는 고객님께 딱 맞는 트렌디한 선택입니다. \n 최신형 세단으로 스타일과 실용성 두 마리 토끼를 잡을 수 있는 완벽한 선택입니다. \n 이 차량으로 한 단계 더 업그레이드된 라이프스타일을 경험해 보세요.",
+            1: "VIP 고객님에게 어울리는 고급스러움을 제공하는 차량입니다. \n  고급 세단으로서 품격 있는 스타일을 완성해 드립니다. \n 더욱 럭셔리한 운전을 즐기세요.",
+            2: "가격 대비 성능 최고! Avante (CN7 N)은 경제적이면서도 뛰어난 성능을 자랑하는 차량입니다.",
+            3: "젊은 고객님, 스타일과 친환경성을 모두 고려한 Avante (CN7 N)!\n  최신 기술과 뛰어난 성능, 이 차량은 바로 고객님의 라이프스타일에 맞는 완벽한 파트너입니다.",
+            4: "이 차량은 친환경차 선호도가 높은 고객님께도 안성맞춤!\n  가격 대비 성능이 뛰어나며 실용성도 고려한 Avante (CN7 N)을 추천 드립니다.",
+            5: "신뢰할 수 있는 차량, Avante (CN7 N)!\n  현금 거래 비율이 높은 고객님께는 안정감과 실용성까지 제공하는 세련된 선택이 될 거예요.",
+            6: "젊은 고객님들에게 더 없이 좋은 가격 대비 성능의 Avante (CN7 N)!\n  실용적이면서도 트렌디한 선택을 원하신다면 이 차가 바로 정답입니다.",
+            7: "친환경차를 선호하시는 고객님에게 더할 나위 없이 좋은 전기차 옵션까지 고려한 Avante (CN7 N),\n  이 차와 함께라면 환경을 생각하는 운전이 가능해요."
         },
         "NEXO (FE)": {
-            0: "친환경을 중요시하는 고객님께 완벽한 선택, 수소차 NEXO! 연령대가 젊고 환경을 생각하는 여러분께 딱 맞는 차량입니다. 지속 가능한 미래를 위한 선택을 하세요.",
-            1: "친환경차 선호도가 높은 VIP 고객님께 완벽한 고급스러움과 친환경을 동시에 만족시킬 수 있는 차량, NEXO! 고급스러우면서도 환경을 생각하는 똑똑한 선택입니다.",
-            4: "친환경차에 대한 관심이 높은 고객님께 맞춤 추천! NEXO는 연료비 절감과 친환경적 요소를 모두 고려한 차량으로, 미래를 향한 현명한 선택입니다.",
-            7: "친환경을 생각하는 고객님께 완벽한 선택, 수소차 NEXO! 100% 친환경차로, 여러분의 선택이 더욱 빛날 것입니다. 고급스러움과 친환경을 동시에 갖춘 NEXO를 만나보세요."
+            0: "친환경을 중요시하는 고객님께 완벽한 선택, 수소차 NEXO! \n 연령대가 젊고 환경을 생각하는 여러분께 딱 맞는 차량입니다. 지속 가능한 미래를 위한 선택을 하세요.",
+            1: "친환경차 선호도가 높은 VIP 고객님께 완벽한 고급스러움과 친환경을 동시에 만족시킬 수 있는 차량, NEXO!\n  고급스러우면서도 환경을 생각하는 똑똑한 선택입니다.",
+            4: "친환경차에 대한 관심이 높은 고객님께 맞춤 추천!\n  NEXO는 연료비 절감과 친환경적 요소를 모두 고려한 차량으로, 미래를 향한 현명한 선택입니다.",
+            7: "친환경을 생각하는 고객님께 완벽한 선택, 수소차 NEXO!\n  완벽한 친환경차로, 여러분의 선택이 더욱 빛날 것입니다. 고급스러움과 친환경을 동시에 갖춘 NEXO를 만나보세요."
         },
         "Santa-Fe ™": {
-            0: "가족 단위 고객님께 완벽한 공간과 실용성을 제공하는 Santa-Fe! 넓고 다용도로 사용 가능한 SUV, 장거리 여행에도 완벽한 선택입니다. 여러분의 생활을 더욱 편리하고 즐겁게 만들어 드려요!",
-            5: "편안한 승차감과 넉넉한 공간을 자랑하는 Santa-Fe! 나이가 많고 현금 거래 비율이 높은 고객님께 실용적이고 신뢰할 수 있는 선택입니다. 가족과 함께 편안한 여행을 떠나세요!"
+            0: "가족 단위 고객님께 완벽한 공간과 실용성을 제공하는 Santa-Fe!\n  넓고 다용도로 사용 가능한 SUV, 장거리 여행에도 완벽한 선택입니다.\n  여러분의 생활을 더욱 편리하고 즐겁게 만들어 드려요!",
+            5: "편안한 승차감과 넉넉한 공간을 자랑하는 Santa-Fe!\n  나이가 많고 현금 거래 비율이 높은 고객님께 실용적이고 신뢰할 수 있는 선택입니다. \n 가족과 함께 편안한 여행을 떠나세요!"
         },
         "G80 (RG3)": {
-            1: "고급스러운 세단을 원하신다면 G80 (RG3)! VIP 고객님께 딱 맞는 차량으로, 품격과 스타일을 모두 갖춘 선택입니다. 차 한 대로 고급스러움을 완성해 보세요."
+            1: "고급스러운 세단을 원하신다면 G80 (RG3)!\n  VIP 고객님께 딱 맞는 차량으로, 품격과 스타일을 모두 갖춘 선택입니다.\n  차 한 대로 고급스러움을 완성해 보세요."
         },
         "G90 (HI)": {
-            1: "한 단계 더 높은 품격을 원하시는 고객님께 G90! 프리미엄 세단의 대명사로, 고급스러움과 편안함을 동시에 제공하는 차량입니다. 최상의 편안함을 원하신다면 G90을 선택하세요.",
-            7: "거래 금액이 매우 높고, 친환경차를 선호하시는 고객님께 딱 맞는 고급 전기차, G90! 프리미엄 이미지를 더한 친환경차로, 완벽한 선택입니다."
+            1: "한 단계 더 높은 품격을 원하시는 고객님께 G90!\n  프리미엄 세단의 대명사로, 고급스러움과 편안함을 동시에 제공하는 차량입니다.\n  최상의 편안함을 원하신다면 G90을 선택하세요.",
+            7: "거래 금액이 매우 높고, 친환경차를 선호하시는 고객님께 딱 맞는 고급 전기차, G90!\n  프리미엄 이미지를 더한 친환경차로, 완벽한 선택입니다."
         },
         "IONIQ 6 (CE)": {
-            1: "친환경차에 대한 관심이 늘고 있는 고객님께, 고급 전기차 IONIQ 6! 고급스러운 외관과 첨단 기술을 갖춘 차량으로, 친환경을 고려하면서도 세련된 스타일을 제공합니다.",
-            7: "친환경을 생각하는 고객님께 더욱 특별한 IONIQ 6! 고급스러움과 친환경성을 동시에 갖춘 전기차로, 미래 지향적인 선택이 될 것입니다."
+            1: "친환경차에 대한 관심이 늘고 있는 고객님께, 고급 전기차 IONIQ 6! \n 고급스러운 외관과 첨단 기술을 갖춘 차량으로, 친환경을 고려하면서도 세련된 스타일을 제공합니다.",
+            7: "친환경을 생각하는 고객님께 더욱 특별한 IONIQ 6! \n 고급스러움과 친환경성을 동시에 갖춘 전기차로, 미래 지향적인 선택이 될 것입니다."
         },
         "i30 (PD)": {
-            2: "가격이 저렴하고 실용적인 소형차, i30! 연령대가 높고 거래 금액이 적은 고객님께 부담 없는 유지비와 실용성을 제공하는 완벽한 선택입니다.",
-            6: "저렴한 가격으로 실용성을 고려한 i30! 거래 금액과 구매 빈도가 낮은 고객님께 실용적이고 경제적인 소형차를 추천드립니다."
+            2: "가격이 저렴하고 실용적인 소형차, i30! \n 연령대가 높고 거래 금액이 적은 고객님께 부담 없는 유지비와 실용성을 제공하는 완벽한 선택입니다.",
+            6: "저렴한 가격으로 실용성을 고려한 i30! \n 거래 금액과 구매 빈도가 낮은 고객님께 실용적이고 경제적인 소형차를 추천드립니다."
         },
         "Tucson (NX4 PHEV)": {
-            3: "환경을 고려한 플러그인 하이브리드 SUV, Tucson! 친환경차 비율이 높은 고객님께 적합한 선택으로, 실용적인 공간과 뛰어난 연비를 자랑합니다.",
-            4: "연료 효율성을 중시하는 고객님께 맞춤 추천! Tucson은 플러그인 하이브리드로, 경제적인 연비와 친환경성을 모두 고려한 차량입니다."
+            3: "환경을 고려한 플러그인 하이브리드 SUV, Tucson!\n  친환경차 비율이 높은 고객님께 적합한 선택으로, 실용적인 공간과 뛰어난 연비를 자랑합니다.",
+            4: "연료 효율성을 중시하는 고객님께 맞춤 추천!\n  Tucson은 플러그인 하이브리드로, 경제적인 연비와 친환경성을 모두 고려한 차량입니다."
         },
         "Grandeur (GN7 HEV)": {
-            3: "고객님께 적합한 차량, Grandeur HEV! 실용적이고 연비가 뛰어난 하이브리드 세단으로, 경제적인 선택이면서도 고급스러운 느낌을 제공합니다.",
-            5: "연비가 뛰어난 하이브리드 세단, Grandeur! 거래 금액이 적은 고객님께 적합하며, 실용적이고 신뢰할 수 있는 선택입니다."
+            3: "고객님께 적합한 차량, Grandeur HEV! \n 실용적이고 연비가 뛰어난 하이브리드 세단으로, 경제적인 선택이면서도 고급스러운 느낌을 제공합니다.",
+            5: "연비가 뛰어난 하이브리드 세단, Grandeur! \n 거래 금액이 적은 고객님께 적합하며, 실용적이고 신뢰할 수 있는 선택입니다."
         },
         "IONIQ (AE EV)": {
-            4: "친환경차에 관심많은 고객님께 가격대가 적당한 전기차인 IONIQ을 추천합니다. IONIQ은 연료비가 적고 실용적인 전기차로 적합합니다."
+            4: "친환경차에 관심많은 고객님께 가격대가 적당한 전기차인 IONIQ을 추천합니다. \n IONIQ은 연료비가 적고 실용적인 전기차로 적합합니다."
         },
         "G70 (IK)": {
-            2: "고객님께 고급스러움을 더할 수 있는 G70! 가격대가 적당하면서도 고급스러움을 갖춘 차량으로, 차별화된 경험을 선사합니다.",
-            5: "고급스러운 느낌의 세단을 선호하는 고객님께, G70! 거래 금액이 적더라도 품격을 높여 줄 차량입니다."
+            2: "고객님께 고급스러움을 더할 수 있는 G70!\n  가격대가 적당하면서도 고급스러움을 갖춘 차량으로, 차별화된 경험을 선사합니다.",
+            5: "고급스러운 느낌의 세단을 선호하는 고객님께, G70! \n 거래 금액이 적더라도 품격을 높여 줄 차량입니다."
+        },
+        "Avante (CN7 HEV)": {
+            2:"가격 대비 뛰어난 성능을 자랑하는 Avante (CN7 HEV)! 뛰어난 연비와 친환경적인 장점으로 실용적인 선택이 될 것입니다.\n경제적이면서도 환경을 고려한 현명한 선택을 하세요.",
+            6:"젊은 고객님들에게 더 없이 좋은 가격 대비 성능의 Avante (CN7 N)! 좋은 연비로 실용적이면서도 트렌디한 선택을 원하신다면 이 차가 바로 정답입니다."
+        
         }
     }
 
     st.text(f"예측된 클러스터: {cluster_id}")
+    st.text("고객의 성향에 맞춘 추천차량 목록입니다.")
     st.text(f"고객 유형: {customer_type}")
     st.text(f"특징: {characteristics}")
 
@@ -351,49 +341,41 @@ def step2_vehicle_selection():
         recommended_vehicles.append(구매한제품)
     
     if recommended_vehicles:
-        # 폼을 사용하여 차량 선택
-        with st.form(key="vehicle_selection_form"):
-            selected_vehicle = st.selectbox("구입 희망 차량을 선택하세요", recommended_vehicles, key="vehicle_select_box", index=recommended_vehicles.index(st.session_state.get("selected_vehicle", recommended_vehicles[0])))
-            submit_button = st.form_submit_button("차량 정보 확인")
+        # 차량 선택
+        selected_vehicle = st.selectbox("구입 희망 차량을 선택하세요", recommended_vehicles, key="vehicle_select_box", index=recommended_vehicles.index(st.session_state.get("selected_vehicle", recommended_vehicles[0])))
+        
+        if selected_vehicle:
+            # 차량 이미지 가져오기
+            vehicle_image = vehicle_images.get(selected_vehicle, "img/default.png")
+            # 차량 링크 가져오기
+            vehicle_link = vehicle_links.get(selected_vehicle, "#")
+            # 차량 설명 가져오기
+            vehicle_description = vehicle_recommendations.get(selected_vehicle, {}).get(cluster_id, basic_recommendations.get(selected_vehicle, "차량에 대한 정보가 없습니다."))
+            # 차량 가격 가져오기
+            vehicle_price = vehicle_prices.get(selected_vehicle, "가격 정보 없음")
             
-            if submit_button:
-                # 선택된 차량을 세션 상태에 저장
-                st.session_state["selected_vehicle"] = selected_vehicle
-
-                # 고객이 선택한 차량에 대한 이미지와 설명 표시
-                if selected_vehicle:
-                    # 차량 이미지 가져오기
-                    vehicle_image = vehicle_images.get(selected_vehicle, "img/default.png")  # 기본 이미지 경로 설정
-
-                        # 차량 링크 가져오기
-                    vehicle_link = vehicle_links.get(selected_vehicle, "#")  # 링크가 없다면 #로 기본 설정
-                    
-                    # 차량 설명 가져오기
-                    vehicle_description = vehicle_recommendations.get(selected_vehicle, {}).get(cluster_id, basic_recommendations.get(selected_vehicle, "차량에 대한 정보가 없습니다."))
-                    
-                    # 이미지 출력과 링크 추가
-                    st.image(vehicle_image, caption=f"{selected_vehicle} 이미지")
-                    st.markdown(f"[차량 상세정보 확인하기]({vehicle_link})", unsafe_allow_html=True)
-
-
-
-                    # 설명 출력
-                    st.text(vehicle_description)
-                else:
-                    st.warning("추천 차량이 없습니다. 다시 예측을 시도해 주세요.")
-            submit_button2 = st.form_submit_button("선택 완료")
-            if submit_button2:
-                # 선택된 차량을 세션 상태에 저장
-                st.session_state["selected_vehicle"] = selected_vehicle
-                st.success(f"{selected_vehicle} 선택 완료! 이제 고객 정보를 저장합니다.")
-                st.session_state["step"] = 3  # 고객 정보 저장 단계로 이동
-                # 화면 새로고침
-                st.rerun()
+            # 이미지 출력과 링크 추가
             
+            st.image(vehicle_image, use_container_width=True)
+            st.text(vehicle_description)
+            st.markdown(f"[차량 상세정보 확인하기]({vehicle_link})", unsafe_allow_html=True)
+            st.text(f"가격: {vehicle_price}원")
 
+        else:
+            st.warning("추천 차량이 없습니다. 다시 예측을 시도해 주세요.")
 
-
-
+        #차량 가격을 구매한금액
+        
+        # 차량 선택 완료 버튼
+        submit_button = st.button("선택 완료")
+        if submit_button:
+            st.session_state["거래금액"] = vehicle_price #최종 선택 차량의 가격을 거래금액으로 저장
+            st.session_state["selected_vehicle"] = selected_vehicle
+            st.success(f"{selected_vehicle} 선택 완료! 이제 고객 정보를 저장합니다.")
+            st.session_state["step"] = 3  # 고객 정보 저장 단계로 이동
+            # 화면 새로고침
+            st.rerun()
+            
 
 
 def step3_customer_data_storage():
