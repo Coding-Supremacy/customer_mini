@@ -5,6 +5,8 @@ from streamlit_option_menu import option_menu
 import plotly.express as px
 import plotly.io as pio
 import plotly.colors as pc
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 # 페이지 설정 (가장 먼저 호출되어야 함)
 st.set_page_config(page_title="🚗 현대자동차 고객 분석 대시보드", layout="wide")
@@ -250,68 +252,91 @@ def run_eda():
         def load_data(file_path):
             return pd.read_csv(file_path)
 
-        # CSV 파일 새로 불러오기 (세션 상태에 데이터 저장)
-        if 'df' not in st.session_state:  # 세션 상태에 df가 없으면 새로 로드
+       # 파일 변경 감지 및 데이터 업데이트
+        class FileChangeHandler(FileSystemEventHandler):
+            def on_modified(self, event):
+                if event.src_path == file_path:
+                    st.session_state.data_updated = True
+
+        # 파일 감지 함수
+        def watch_file_changes():
+            event_handler = FileChangeHandler()
+            observer = Observer()
+            observer.schedule(event_handler, path=os.path.dirname(file_path), recursive=False)
+            observer.start()
+            return observer
+
+        # 파일 변경 감지를 위한 Observer 시작
+        if 'observer' not in st.session_state:
+            st.session_state.observer = watch_file_changes()
+
+        # 데이터를 로드하고 캐시를 사용하여 자동으로 업데이트
+        @st.cache_data(ttl=60)  # TTL을 설정하여 캐시된 데이터를 일정 시간 동안 유지
+        def get_data():
             if os.path.exists(file_path):
-                st.session_state.df = load_data(file_path)
+                return load_data(file_path)
             else:
                 st.error(f"⚠️ CSV 파일이 존재하지 않습니다: {file_path}")
-        else:
-            df = st.session_state.df
+                return pd.DataFrame()
+
+        # 데이터 로드
+        df = get_data()
+
+        # 데이터가 업데이트되었는지 확인
+        if 'data_updated' in st.session_state and st.session_state.data_updated:
+            df = get_data()  # 데이터 새로고침
+            st.session_state.data_updated = False
 
             # 데이터에서 시구와 구매한 제품 및 구매수 컬럼 추출
-            if '시구' in df.columns and '구매한 제품' in df.columns and '제품 구매 빈도' in df.columns:
-                # 지역별 구매한 제품 수 시각화
-                product_count_by_region = df.groupby(['시구', '구매한 제품']).sum().reset_index()
+        if '시구' in df.columns and '구매한 제품' in df.columns and '제품 구매 빈도' in df.columns:
+            # 지역별 구매한 제품 수 시각화
+            product_count_by_region = df.groupby(['시구', '구매한 제품']).sum().reset_index()
 
-                pastel_colors = pc.qualitative.Pastel
+            pastel_colors = pc.qualitative.Pastel
 
-                # Plotly를 사용한 바 차트 생성 (전체 지역의 제품 구매 빈도)
-                bar_fig = px.bar(product_count_by_region, 
-                                x='시구', 
-                                y='제품 구매 빈도', 
-                                color='구매한 제품', 
-                                title='지역별 구매한 제품 수',
-                                labels={'시구': '지역', '제품 구매 빈도': '구매 빈도', '구매한 제품': '제품'},
-                                color_discrete_sequence=pastel_colors)  # 색상 팔레트 지정
+            # Plotly를 사용한 바 차트 생성 (전체 지역의 제품 구매 빈도)
+            bar_fig = px.bar(product_count_by_region, 
+                            x='시구', 
+                            y='제품 구매 빈도', 
+                            color='구매한 제품', 
+                            title='지역별 구매한 제품 수',
+                            labels={'시구': '지역', '제품 구매 빈도': '구매 빈도', '구매한 제품': '제품'},
+                            color_discrete_sequence=pastel_colors)  # 색상 팔레트 지정
 
-                # 그래프 꾸미기
-                bar_fig.update_layout(
-                    title={'text': '지역별 구매한 제품 수', 'x': 0.5, 'xanchor': 'center', 'font': {'size': 20, 'family': 'Nanum Gothic', 'color': '#333'}},
-                    xaxis=dict(title='지역', tickangle=45),
-                    yaxis=dict(title='제품 구매 빈도'),
-                    margin=dict(l=40, r=40, t=40, b=80),
-                    plot_bgcolor='#f4f4f9',
-                    paper_bgcolor='#ffffff',
-                    font=dict(family='Nanum Gothic', size=12, color='#333'),
-                    showlegend=True,
-                )
+            # 그래프 꾸미기
+            bar_fig.update_layout(
+                title={'text': '지역별 구매한 제품 수', 'x': 0.5, 'xanchor': 'center', 'font': {'size': 20, 'family': 'Nanum Gothic', 'color': '#333'}},
+                xaxis=dict(title='지역', tickangle=45),
+                yaxis=dict(title='제품 구매 빈도'),
+                margin=dict(l=40, r=40, t=40, b=80),
+                plot_bgcolor='#f4f4f9',
+                paper_bgcolor='#ffffff',
+                font=dict(family='Nanum Gothic', size=12, color='#333'),
+                showlegend=True,
+            )
 
-                # 그래프 시각화
-                st.plotly_chart(bar_fig)
+            # 그래프 시각화
+            st.plotly_chart(bar_fig)
 
-                # 간격 추가 (두 차트 사이)
-                st.markdown("<br><br>", unsafe_allow_html=True)
+            # 지역 선택 (selectbox)
+            region_selected = st.selectbox("지역을 선택하세요:", df['시구'].unique())
 
-                # 지역 선택 (selectbox)
-                region_selected = st.selectbox("지역을 선택하세요:", df['시구'].unique())
+            # 선택한 지역의 데이터 필터링
+            region_data = df[df['시구'] == region_selected]
 
-                # 선택한 지역의 데이터 필터링
-                region_data = df[df['시구'] == region_selected]
+            # 선택한 지역에 대한 구매한 제품별 총 갯수
+            product_count_by_selected_region = region_data.groupby('구매한 제품')['제품 구매 빈도'].sum().reset_index()
+
+            # 지역에 맞는 제품 구매 빈도를 파이 차트로 시각화
+            pie_chart_fig = px.pie(product_count_by_selected_region,
+                                    names='구매한 제품',
+                                    values='제품 구매 빈도',
+                                    title=f'{region_selected} 지역별 제품 구매 비율',
+                                    color_discrete_sequence=pastel_colors)
+
+            # 파이 차트 그래프 시각화
+            st.plotly_chart(pie_chart_fig)
                 
-                # 선택한 지역에 대한 구매한 제품별 총 갯수
-                product_count_by_selected_region = region_data.groupby('구매한 제품')['제품 구매 빈도'].sum().reset_index()
-
-                # 지역에 맞는 제품 구매 빈도를 파이 차트로 시각화
-                pie_chart_fig = px.pie(product_count_by_selected_region,
-                                        names='구매한 제품',
-                                        values='제품 구매 빈도',
-                                        title=f'{region_selected} 지역별 제품 구매 비율',
-                                        color_discrete_sequence=pastel_colors)
-
-                # 파이 차트 그래프 시각화
-                st.plotly_chart(pie_chart_fig)
-
         st.markdown("</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
