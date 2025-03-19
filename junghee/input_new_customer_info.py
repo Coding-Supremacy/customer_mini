@@ -118,7 +118,48 @@ eco_friendly_models = [
 #     else:
 #         st.error(f"메시지 전송 실패: {response.status_code}, {response.text}")
 
+
+
 def run_input_customer_info():
+    st.markdown(
+    """
+    <style>
+/* 네비게이션 스타일 */
+    .css-1y4p8pa.e1fqkh3o3 {
+        background-color: #FFCC80;
+        border-radius: 10px;
+        padding: 8px 16px;
+        font-weight: bold;
+        color: #5A3E36;
+        text-align: center;
+    }
+    /* 버튼 스타일 */
+    div.stButton > button, div[data-testid="stFormSubmitButton"] button {
+        background-color: #2E86C1 !important;
+        color: #000000 !important;
+        font-size: 16px !important;
+        font-weight: bold !important;
+        border-radius: 10px !important;
+        padding: 12px 24px !important;
+        border: none !important;
+        transition: all 0.3s ease-in-out !important;
+    }
+    /* 버튼 마우스 호버 효과 */
+    div.stButton > button:hover, div[data-testid="stFormSubmitButton"] button:hover {
+        background-color: #6699FF !important;
+        transform: scale(1.05) !important;
+        box-shadow: 0px 4px 10px rgba(255, 179, 71, 0.3) !important;
+    }
+    /* 버튼 클릭 효과 */
+    div.stButton > button:active, div[data-testid="stFormSubmitButton"] button:active {
+        background-color: #2E86C1 !important;
+        transform: scale(0.98) !important;
+    }
+    </style>
+    """, 
+    unsafe_allow_html=True
+)
+
     # 고객 개인정보 입력.
     st.title('📋 고객 정보 입력')
     
@@ -133,6 +174,7 @@ def run_input_customer_info():
             #### 고객 정보를 입력하고 예측 버튼을 눌러주세요.
             #### 모든 항목은 필수입니다.
             """)
+    
     
     with st.form(key="customer_info_form"):
         # 사용자 입력 받기 (각각의 입력창에 고유한 key 지정)
