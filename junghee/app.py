@@ -1,3 +1,4 @@
+import threading
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -11,6 +12,8 @@ import os
 
 from description import run_description
 from eda import run_eda
+
+import promo_email
 
 # 페이지 설정
 st.set_page_config(page_title="🚗 고객 클러스터링 & 맞춤형 프로모션 시스템", layout="wide")
@@ -52,7 +55,7 @@ def run_app():
 
     with st.sidebar:
         selected = option_menu("메뉴", menu, 
-            icons=['house'], menu_icon="cast", default_index=1)
+            icons=['house'], menu_icon="cast", default_index=0)
         
     if selected == '홈' :
         run_home()
@@ -76,4 +79,8 @@ def run_app():
     
 
 if __name__ == "__main__":
+    # 🟢 백그라운드에서 이메일 스케줄 실행
+    scheduler_thread = threading.Thread(target=promo_email.schedule_worker, daemon=True)
+    scheduler_thread.start()
+
     run_app()

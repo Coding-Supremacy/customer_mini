@@ -1,11 +1,15 @@
 import base64
+from datetime import datetime
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import os
 import re
 import smtplib
+import time
 
 import pandas as pd
+import schedule
 
 
 
@@ -38,7 +42,8 @@ def get_random_email_content(cluster_id):
         return "맞춤 프로모션 정보를 찾을 수 없습니다.", "제목 없음"
 
 def send_promotion_email(이메일, 이름, cluster_id):
-        
+
+
     random_body, random_subject = get_random_email_content(cluster_id)
 
     
@@ -115,5 +120,148 @@ def send_promotion_email(이메일, 이름, cluster_id):
             server.sendmail(EMAIL_ADDRESS, 이메일, msg.as_string())
 
         print(f"✅ 이메일 전송 완료: {이메일}, 제목: {subject}")
+
+        
+
     except Exception as e:
         print(f"🚨 이메일 전송 실패: {str(e)}")
+
+
+
+def send_welcome_email(이메일, 이름, 아이디, 가입일):
+    """회원가입 환영 이메일 자동 발송"""
+    subject = "[현대자동차] 회원가입을 환영합니다! 🚗"
+    
+    # HTML 이메일 내용
+    body = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
+        <table style="width: 100%; max-width: 800px; margin: auto; background: white; padding: 30px; 
+                    border-radius: 15px; box-shadow: 0px 5px 15px rgba(0,0,0,0.1);">
+            
+            <!-- 헤더 (현대 로고 + 환영 아이콘) -->
+            <tr>
+                <td style="padding: 10px; text-align: left;">
+                    <a href="https://www.hyundai.com" target="_blank">
+                        <img src="cid:hyundai_logo" alt="현대 로고" style="width: 120px;">
+                    </a>
+                </td>
+                <td style="padding: 10px; text-align: right;">
+                    <img src="cid:welcome_icon" alt="가입 환영" style="width: 200px; background: none; border: none;">
+                </td>
+            </tr>
+
+            <!-- 본문 -->
+            <tr>
+                <td colspan="2" style="padding: 30px; text-align: center;">
+                    <h2>
+                        <span style="color: #005bac;">현대자동차 회원가입</span> 
+                        <span style="color: #4B4B4B;">을 환영합니다!</span>
+                    </h2>
+
+
+                    <!-- 회원가입 안내 문구 왼쪽 정렬 -->
+                    <div style="text-align: left; font-size: 18px; max-width: 600px; margin: auto;">
+                        <p><strong>{이름}</strong> 고객님, 안녕하세요!</p>
+                        <p>현대자동차의 회원이 되신 것을 진심으로 환영합니다.</p>
+                        <p>앞으로 다양한 혜택과 맞춤형 프로모션 정보를 받아보실 수 있습니다.</p>
+                    </div>
+                    
+                    <!-- 구분선 추가 -->
+                    <div style="width: 100%; max-width: 600px; margin: 20px auto; border-bottom: 1px solid #ddd;"></div>
+
+
+                    <!-- 회원 정보 테이블 -->
+                    <table style="width: 100%; max-width: 500px; margin: auto; border-collapse: collapse; background: #f8f9fa; padding: 20px; border-radius: 10px; font-size: 16px; margin-top: 20px;">
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold; text-align: left;">아이디</td>
+                            <td style="padding: 10px; text-align: left;">{아이디}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; font-weight: bold; text-align: left;">가입일</td>
+                            <td style="padding: 10px; text-align: left;">{가입일}</td>
+                        </tr>
+                    </table>
+                    
+                    <a href="https://www.hyundai.com" 
+                    style="display: inline-block; background: #005bac; color: white; padding: 15px 30px; 
+                            text-decoration: none; border-radius: 8px; margin-top: 20px; font-size: 16px;">
+                        현대자동차 구경하러가기
+                    </a>
+                </td>
+            </tr>
+
+            <!-- 푸터 -->
+            <tr>
+                <td colspan="2" style="padding: 15px; font-size: 14px; text-align: center; color: gray;">
+                    ※ 본 메일은 자동 발송되었으며, 문의 사항은 고객센터를 이용해 주세요.
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    """
+    
+    # 이메일 메시지 생성
+    msg = MIMEMultipart()
+    msg["From"] = "현대자동차"
+    msg["To"] = 이메일
+    msg["Subject"] = subject
+    msg.attach(MIMEText(body, "html"))
+
+    # 로고 이미지 첨부 (CID 참조)
+    with open("img/hyundai_logo.jpg", "rb") as img_file:
+        img = MIMEImage(img_file.read())
+        img.add_header("Content-ID", "<hyundai_logo>")
+        msg.attach(img)
+
+    # 웰컴 이미지 첨부 (CID 참조)
+    with open("img/welcome.png", "rb") as img_file:
+        img = MIMEImage(img_file.read())
+        img.add_header("Content-ID", "<welcome_icon>")
+        msg.attach(img)
+
+    # 이메일 전송
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            server.sendmail(EMAIL_ADDRESS, 이메일, msg.as_string())
+        print(f"✅ 회원가입 환영 이메일 전송 완료: {이메일}")
+
+        
+
+    except Exception as e:
+        print(f"🚨 이메일 전송 실패: {str(e)}")
+
+
+
+print("현재 디렉토리:", os.getcwd())  # 현재 디렉토리 출력
+print("파일 목록:", os.listdir())  # 현재 디렉토리 내 파일 목록 출력
+
+
+
+# 고객 데이터 불러오기
+customer_df = pd.read_csv('D:\junghee\GitHub\customer_mini\data\이메일_전송_로그.csv')
+
+# **📌 자동 이메일 발송 스케줄링 기능**
+def send_scheduled_emails():
+    print("📢 정기 이메일 발송 시작!")
+
+    
+     # 하루 최대 10명에게만 이메일 전송 (랜덤 샘플)
+    customers_to_email = customer_df.sample(n=min(10, len(customer_df)))
+
+    for _, row in customers_to_email.iterrows():
+        send_promotion_email(row["이메일"], row["이름"], row["클러스터 ID"])
+
+    print("✅ 정기 이메일 발송 완료!")
+
+# **📌 스케줄 설정 (매일 오전 9시 실행)**
+schedule.every(5).minutes.do(send_scheduled_emails)
+
+# 📌 스케줄 실행 함수
+def schedule_worker():
+    while True:
+        schedule.run_pending()
+        time.sleep(60)  # 1분마다 확인
