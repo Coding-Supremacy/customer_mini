@@ -144,7 +144,7 @@ def run_eda():
         - 특정 연도에 가입한 고객들이 어떤 세그먼트에 속하는지 파악하여 타겟 마케팅을 설계할 수 있습니다.
         - 또한, 연도별 고객 유입 트렌드를 분석하여 향후 고객 이탈을 방지하는 전략을 개발하는 데 도움을 줍니다.
         """)
-        image_path = "C:\ground\Github\customer_mini\jisang\customer_segment\가입연도와 고객 세그먼트 관계.png"
+        image_path = "../customer_segment/가입연도와 고객 세그먼트 관계.png"
         if os.path.exists(image_path):
             st.image(image_path)
             st.markdown("""
@@ -169,7 +169,7 @@ def run_eda():
         - VIP 고객과 일반 고객군의 소비 차이를 파악하여 차별화된 전략을 설계합니다.
         - 특정 세그먼트에서 거래 금액이 급격히 증가하는 시점을 파악하여 프로모션 효과성 분석을 할 수 있습니다.
         """)
-        image_path = "C:\ground\Github\customer_mini\jisang\customer_segment\고객 세그먼트별 거래 금액 분포.png"
+        image_path = "../customer_segment/고객 세그먼트별 거래 금액 분포.png"
         if os.path.exists(image_path):
             st.image(image_path)
             st.markdown("""
@@ -194,7 +194,7 @@ def run_eda():
         - 구매 빈도가 낮은 고객을 대상으로 재구매율을 높이기 위한 마케팅 전략을 수립합니다.
         - 또한, 구매 빈도가 높은 고객을 분석하여 더 많은 혜택을 제공할 수 있습니다.
         """)
-        image_path = "C:\ground\Github\customer_mini\jisang\customer_segment\구매빈도와 고객 세그먼트 관계.png"
+        image_path = "../customer_segment/구매빈도와 고객 세그먼트 관계.png"
         if os.path.exists(image_path):
             st.image(image_path)
             st.markdown("""
@@ -212,7 +212,7 @@ def run_eda():
     if selected == "📈 클러스터링 분석":
         st.markdown("<div class='tab-content'>", unsafe_allow_html=True)
         st.subheader("📈 클러스터별 고객 세그먼트 분석")
-        image_path = "C:/customer_mini/cluster_analysis/image/클러스터별 고객 세그먼트 분포.png"
+        image_path = "../image/클러스터별 고객 세그먼트 분포.png"
         if os.path.exists(image_path):
             st.image(image_path)
         else:
@@ -244,10 +244,20 @@ def run_eda():
         """)
 
         # 고객 데이터 (CSV 파일 불러오기)
-        file_path = "C:/ground/Github/customer_mini/jisang/고객데이터 1-2 (시구).csv"  # 절대 경로로 수정
-        if os.path.exists(file_path):
-            # CSV 파일을 pandas DataFrame으로 불러오기
-            df = pd.read_csv(file_path)
+        file_path = "../data/클러스터링고객데이터_5.csv"  # 절대 경로로 수정
+
+        # 데이터 로딩 함수
+        def load_data(file_path):
+            return pd.read_csv(file_path)
+
+        # CSV 파일 새로 불러오기 (세션 상태에 데이터 저장)
+        if 'df' not in st.session_state:  # 세션 상태에 df가 없으면 새로 로드
+            if os.path.exists(file_path):
+                st.session_state.df = load_data(file_path)
+            else:
+                st.error(f"⚠️ CSV 파일이 존재하지 않습니다: {file_path}")
+        else:
+            df = st.session_state.df
 
             # 데이터에서 시구와 구매한 제품 및 구매수 컬럼 추출
             if '시구' in df.columns and '구매한 제품' in df.columns and '제품 구매 빈도' in df.columns:
@@ -301,11 +311,6 @@ def run_eda():
 
                 # 파이 차트 그래프 시각화
                 st.plotly_chart(pie_chart_fig)
-
-            else:
-                st.error("CSV 파일에 '시구', '구매한 제품', '제품 구매 빈도' 컬럼이 없습니다.")
-        else:
-            st.error(f"⚠️ CSV 파일이 존재하지 않습니다: {file_path}")
 
         st.markdown("</div>", unsafe_allow_html=True)
 

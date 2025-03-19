@@ -16,7 +16,6 @@ def number_to_korean(num):
     return num2words(num, to='currency', lang='ko')
 
 
-
 # 클러스터 ID에 대한 설명
 cluster_description = {
     0: ("30대 중반 고객", "거래 금액 크고, 제품 구매 빈도 높음, 친환경차 비율 낮음"),
@@ -66,6 +65,15 @@ def run_input_customer_info():
     elif st.session_state["step"] == 3:
         step3_customer_data_storage()  # 고객 정보 저장
 
+# 시구 추출 함수
+def extract_sigu(address):
+    # '광역시', '특별시', '도' 등을 포함한 시구만 추출
+    match = re.search(r'([가-힣]+(?:광역시|특별시|도)? [가-힣]+(?:시|구))', address)
+    if match:
+        return match.group(0)
+    else:
+        return "시구 없음"
+
 
 
 # 예측을 위한 입력값을 처리하는 함수
@@ -73,7 +81,7 @@ def run_input_step1():
     st.title('📋 고객 정보 입력')
 
     # 모델 로드
-    model = joblib.load("model/model4.pkl")
+    model = joblib.load("C:\ground\Github\customer_mini\model\model4.pkl")
 
     st.info("""
             #### 고객 정보를 입력하고 예측 버튼을 눌러주세요.
@@ -167,14 +175,7 @@ def run_input_step1():
             st.session_state["recommended_vehicles"] = get_recommended_vehicles(cluster_id, "여" if 구매한제품 in eco_friendly_models else "부")
             st.rerun()
 
-# 시구 추출 함수
-def extract_sigu(address):
-    # '광역시', '특별시', '도' 등을 포함한 시구만 추출
-    match = re.search(r'([가-힣]+(?:광역시|특별시|도)? [가-힣]+(?:시|구))', address)
-    if match:
-        return match.group(0)
-    else:
-        return "시구 없음"
+
 
 
 # 차량 추천 (친환경차 여부 포함)
@@ -308,7 +309,7 @@ def step3_customer_data_storage():
                                              "거래 방식", "제품 구매 빈도", "제품 구매 경로", "제품 출시년월", "Cluster", "시구"])
 
             # CSV 파일에 저장
-            file_path = 'data/고객정보.csv'
+            file_path = '../data/클러스터링고객데이터_5.csv'
             file_exists = pd.io.common.file_exists(file_path)
             full_data.to_csv(file_path, mode='a', header=not file_exists, index=False)
 

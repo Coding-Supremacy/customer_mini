@@ -6,7 +6,7 @@ from streamlit_option_menu import option_menu
 
 
 from home import run_home
-from input_new_customer_info2 import run_input_customer_info
+from input_new_customer_info import run_input_customer_info
 import os
 
 from description import run_description
