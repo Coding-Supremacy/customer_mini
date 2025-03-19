@@ -7,13 +7,7 @@ import time
 import base64
 import requests
 import promo_email
-from num2words import num2words
 
-# 숫자를 한글로 변환하는 함수 (천 단위 포맷 처리)
-def number_to_korean(num):
-    if num == 0:
-        return "0 원"  # 0일 경우 처리
-    return num2words(num, to='currency', lang='ko')
 
 # 클러스터 ID에 대한 설명
 cluster_description = {
@@ -72,7 +66,7 @@ def run_input_step1():
     model = joblib.load("model/model4.pkl")
 
     st.info("""
-            #### 고객 정보를 입력하고 예측 버튼을 눌러주세요.
+            #### 정보를 입력하고 예측 버튼을 눌러주세요.
             #### 모든 항목은 필수입니다.
             """)
 
@@ -92,18 +86,12 @@ def run_input_step1():
 
 
             # 생년월일 입력 (1900년부터 20년 전 날짜까지 선택 가능)
-            생년월일 = st.date_input("생년월일 입력", min_value=datetime(1900, 1, 1), max_value=year_20_years_ago, key="dob_input")
+            생년월일 = st.date_input("생년월일 입력", min_value=datetime(1900, 1, 1), max_value=year_20_years_ago)
             if 생년월일:
                 today = datetime.today()
                 연령 = today.year - 생년월일.year - ((today.month, today.day) < (생년월일.month, 생년월일.day))
-                st.markdown(f"###### ✔ 계산된 나이 : `{연령}세` ")
             고객세그먼트 = st.selectbox("고객 세그먼트 선택", ["신규", "VIP", "일반", "이탈가능"], index=0)
-            거래금액 = st.number_input("고객 예산 입력", min_value=0, step=1000000, key="transaction_amount_input")
-            
-            # 입력한 거래금액을 천 단위로 표시
-            거래금액_한글 = number_to_korean(int(거래금액))
-            st.markdown(f"###### ✔ 입력한 금액 : `{거래금액_한글}` ")
-
+            거래금액 = st.number_input("고객 예산 입력", min_value=10000000, step=1000000)
             구매빈도 = st.number_input("제품 구매 빈도 입력", min_value=1, step=1, value=1)
 
 
@@ -141,6 +129,8 @@ def run_input_step1():
             st.session_state["제품구매빈도"] = 구매빈도
             st.session_state["제품구매경로"] = 구매경로
             st.session_state["제품출시년월"] = launch_dates.get(구매한제품)
+            st.session_state["구매한제품"] = 구매한제품
+            st.session_state["친환경차"] = "여" if 구매한제품 in eco_friendly_models else "부"
 
 
 
@@ -193,27 +183,18 @@ def get_recommended_vehicles(cluster_id, 친환경차):
 
 # 2단계: 고객이 모델 선택 후 인적 사항 입력
 def step2_vehicle_selection():
-    st.title("🚗 추천 차량 선택")
+    st.title("🚗 고객님을 위한 차량 추천")
 
-    # 추천 차량 목록이 잘 저장되었는지 확인
     recommended_vehicles = st.session_state.get("recommended_vehicles", [])
     st.write("추천 차량 목록:", recommended_vehicles)  # 추천 차량 리스트 출력
 
     if recommended_vehicles:
-        # 폼을 사용하여 차량 선택
-        with st.form(key="vehicle_selection_form"):
-            # 세션 상태에 이미 선택된 차량이 있으면 그걸 기본값으로 설정
-            selected_vehicle = st.selectbox("구입 희망 차량을 선택하세요", recommended_vehicles, key="vehicle_select_box", index=recommended_vehicles.index(st.session_state.get("selected_vehicle", recommended_vehicles[0])))
-        
-            # 버튼을 사용하여 선택 완료 처리
-            submit_button = st.form_submit_button("선택 완료")
-            if submit_button:  # 변경된 부분
-                # 선택된 차량을 세션 상태에 저장
-                st.session_state["selected_vehicle"] = selected_vehicle
-                st.success(f"{selected_vehicle} 선택 완료! 이제 고객 정보를 저장합니다.")
-                st.session_state["step"] = 3  # 고객 정보 저장 단계로 이동
-                # 화면 새로고침
-                st.rerun()
+        # 버튼을 사용하여 회원 가입 진행
+        submit_button = st.button("회원 가입")
+        if submit_button:  # 버튼 클릭 시
+            st.session_state["step"] = 3  # 고객 정보 저장 단계로 이동
+            # 화면 새로고침
+            st.rerun()
     else:
         st.warning("추천 차량이 없습니다. 다시 예측을 시도해 주세요.")
 
@@ -235,14 +216,17 @@ def step3_customer_data_storage():
         if st.session_state["phone_error"]:
             st.error("⚠️ 휴대폰 번호는 11자리 숫자여야 합니다. (예: 01012345678)")
         이메일 = st.text_input("이메일 입력", placeholder="필수입니다.", key="email_input")
-        
-        if 이메일 and ("@" not in 이메일 or "." not in 이메일):
+
+        # 이메일 주소 형식 검증 (정규식 사용)
+        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+        if 이메일 and not re.fullmatch(email_regex, 이메일):
             st.session_state["email_error"] = True
         else:
             st.session_state["email_error"] = False
+
         # 오류 메시지 표시
         if st.session_state["email_error"]:
-            st.error("⚠️ 이메일 주소 형식이 올바르지 않습니다. '@'와 '.'을 포함해야 합니다.")
+            st.error("⚠️ 이메일 주소 형식이 올바르지 않습니다. 예: example@domain.com")
 
         주소 = st.text_input("주소")
         아이디 = st.text_input("아이디")
@@ -269,16 +253,14 @@ def step3_customer_data_storage():
             생년월일 = st.session_state.get("생년월일", "")
             성별 = st.session_state.get("성별", "")
             고객세그먼트 = st.session_state.get("고객세그먼트", "")
-            selected_vehicle = st.session_state.get("selected_vehicle", "")
             차량구분 = st.session_state.get("차량구분", "")
-            친환경차 = "여" if selected_vehicle in eco_friendly_models else "부"
-            구매한제품 = selected_vehicle
+            친환경차 = st.session_state.get("친환경차", "")
+            구매한제품 = st.session_state.get("구매한제품", "")
             제품구매날짜 = st.session_state.get("제품구매날짜", "")
             거래금액 = st.session_state.get("거래금액", "")
             거래방식 = st.session_state.get("거래방식", "")
             구매빈도 = st.session_state.get("제품구매빈도", "")
             제품구매경로 = st.session_state.get("제품구매경로", "")
-            제품출시년월 = launch_dates.get(selected_vehicle, "")
             Cluster = st.session_state.get("Cluster", "")
             연령 = st.session_state.get("연령", "")
             구매빈도= st.session_state.get("구매빈도", "")
@@ -304,7 +286,7 @@ def step3_customer_data_storage():
             clicksend_username = st.secrets["CLICKSEND"]["CLICKSEND_USERNAME"]
             clicksend_api_key = st.secrets["CLICKSEND"]["CLICKSEND_API_KEY"]
             to_number = "+82" + 휴대폰번호[1:]  # 국내 번호 형식으로 변환
-            message_body = f"안녕하세요! 고객님을 환영합니다. 선택하신 차량: {st.session_state['selected_vehicle']}"
+            message_body = f"안녕하세요! 고객님을 환영합니다. {이름}님의 클러스터 ID는 {Cluster}입니다."
 
             # ClickSend API 호출 (문자 발송)
             url = "https://rest.clicksend.com/v3/sms/send"
@@ -322,8 +304,8 @@ def step3_customer_data_storage():
                 print("Error sending SMS:", e)
 
             # 이메일 발송
-            promo_email.send_promotion_email(이메일, 이름, st.session_state["selected_vehicle"])
-            st.success("이메일이 성공적으로 발송되었습니다.")
+            promo_email.send_promotion_email(이메일, 이름, Cluster)
+            st.success(f"이메일이 성공적으로 발송되었습니다.{이름}님의 클러스터 ID는 {Cluster}입니다.")
 
 if __name__ == "__main__":
 
