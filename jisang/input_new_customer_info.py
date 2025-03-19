@@ -167,6 +167,15 @@ def run_input_step1():
             st.session_state["recommended_vehicles"] = get_recommended_vehicles(cluster_id, "여" if 구매한제품 in eco_friendly_models else "부")
             st.rerun()
 
+# 시구 추출 함수
+def extract_sigu(address):
+    # '광역시', '특별시', '도' 등을 포함한 시구만 추출
+    match = re.search(r'([가-힣]+(?:광역시|특별시|도)? [가-힣]+(?:시|구))', address)
+    if match:
+        return match.group(0)
+    else:
+        return "시구 없음"
+
 
 # 차량 추천 (친환경차 여부 포함)
 def get_recommended_vehicles(cluster_id, 친환경차):
