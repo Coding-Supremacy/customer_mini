@@ -3,7 +3,7 @@ import pandas as pd
 import joblib
 from datetime import datetime
 import re
-import time
+
 import base64
 import requests
 import promo_email
@@ -50,13 +50,23 @@ eco_friendly_models = [
 def run_input_customer_info():
     if "step" not in st.session_state:
         st.session_state["step"] = 1  # 첫 번째 단계로 시작
-    
     if st.session_state["step"] == 1:
         run_input_step1()  # 고객 정보 입력
     elif st.session_state["step"] == 2:
         step2_vehicle_selection()  # 차량 선택
     elif st.session_state["step"] == 3:
         step3_customer_data_storage()  # 고객 정보 저장
+
+# 시구 추출 함수
+def extract_sigu(address):
+    # '광역시', '특별시', '도' 등을 포함한 시구만 추출
+    match = re.search(r'([가-힣]+(?:광역시|특별시|도)? [가-힣]+(?:시|구))', address)
+    if match:
+        return match.group(0)
+    else:
+        return "시구 없음"
+
+
 
 # 예측을 위한 입력값을 처리하는 함수
 def run_input_step1():
@@ -66,7 +76,7 @@ def run_input_step1():
     model = joblib.load("model/model4.pkl")
 
     st.info("""
-            #### 정보를 입력하고 예측 버튼을 눌러주세요.
+            #### 고객 정보를 입력하고 예측 버튼을 눌러주세요.
             #### 모든 항목은 필수입니다.
             """)
 
@@ -129,8 +139,6 @@ def run_input_step1():
             st.session_state["제품구매빈도"] = 구매빈도
             st.session_state["제품구매경로"] = 구매경로
             st.session_state["제품출시년월"] = launch_dates.get(구매한제품)
-            st.session_state["구매한제품"] = 구매한제품
-            st.session_state["친환경차"] = "여" if 구매한제품 in eco_friendly_models else "부"
 
 
 
@@ -141,60 +149,94 @@ def run_input_step1():
             # 예측 실행
             prediction = model.predict(input_data)
             cluster_id = prediction[0]
-            customer_type, characteristics = cluster_description.get(cluster_id, ("알 수 없는 클러스터", "특징 정보 없음"))
-
-            st.text(f"예측된 클러스터: {cluster_id}")
-            st.text(f"고객 유형: {customer_type}")
-            st.text(f"특징: {characteristics}")
 
             st.session_state["Cluster"] = cluster_id
-
             st.session_state["step"] = 2  # 차량 선택 단계로 넘어가기
-            st.session_state["recommended_vehicles"] = get_recommended_vehicles(cluster_id, "여" if 구매한제품 in eco_friendly_models else "부")
+            st.session_state["recommended_vehicles"] = get_recommended_vehicles(cluster_id)
             st.rerun()
+
+
 
 
 # 차량 추천 (친환경차 여부 포함)
-def get_recommended_vehicles(cluster_id, 친환경차):
-    # 클러스터에 따른 추천 차량 목록
+def get_recommended_vehicles(cluster_id):
     recommended_vehicles = []
-    if cluster_id == 0:
-        recommended_vehicles = ['클러스터 0 추천모델']
-    elif cluster_id == 1:
-        recommended_vehicles = ['클러스터 1 추천모델']
-    elif cluster_id == 2:
-        recommended_vehicles = ['클러스터 2 추천모델']
-    elif cluster_id == 3:
-        recommended_vehicles = ['클러스터 3 추천모델']
-    elif cluster_id == 4:
-        recommended_vehicles = ['클러스터 4 추천모델']
-    elif cluster_id == 5:
-        recommended_vehicles = ['클러스터 5 추천모델']
-    elif cluster_id == 6:
-        recommended_vehicles = ['클러스터 6 추천모델']
-    elif cluster_id == 7:
-        recommended_vehicles = ['클러스터 7 추천모델']
 
-    # 친환경차 여부에 따라 추천 차량을 다르게 처리할 수 있다.
-    if 친환경차 == "여":
-        recommended_vehicles.append("친환경차 모델 추천")
-    
+    if cluster_id == 0:
+        recommended_vehicles = [
+            'Avante (CN7 N)','NEXO (FE)','Santa-Fe ™'
+        ]
+    elif cluster_id == 1:
+        recommended_vehicles = [
+            'G80 (RG3)','G90 (HI)','IONIQ 6 (CE)'
+        ]
+    elif cluster_id == 2:
+        recommended_vehicles = [
+            'G70 (IK)','i30 (PD)','Avante (CN7 HEV)'
+        ]
+    elif cluster_id == 3:
+        recommended_vehicles = [
+            'Avante (CN7 N)','Tucson (NX4 PHEV)','Grandeur (GN7 HEV)'
+        ]
+    elif cluster_id == 4:
+        recommended_vehicles = [
+            'IONIQ (AE EV)','NEXO (FE)','Tucson (NX4 PHEV)'
+        ]
+    elif cluster_id == 5:
+        recommended_vehicles = [
+            'Santa-Fe ™','G70 (IK)','Grandeur (GN7 HEV)'
+        ]
+    elif cluster_id == 6:
+        recommended_vehicles = [
+            'i30 (PD)','Avante (CN7 N)','Avante (CN7 HEV)'
+        ]
+    elif cluster_id == 7:
+        recommended_vehicles = [
+            'IONIQ 6 (CE)','NEXO (FE)','G90 (RS4)'
+        ]
     return recommended_vehicles
+
+
 
 # 2단계: 고객이 모델 선택 후 인적 사항 입력
 def step2_vehicle_selection():
-    st.title("🚗 고객님을 위한 차량 추천")
+    st.title("🚗 추천 차량 선택")
 
+    # 세션 상태에서 필요한 값 가져오기
+    cluster_id = st.session_state.get("Cluster")
     recommended_vehicles = st.session_state.get("recommended_vehicles", [])
-    st.write("추천 차량 목록:", recommended_vehicles)  # 추천 차량 리스트 출력
+    customer_type, characteristics = cluster_description.get(cluster_id, ("알 수 없는 클러스터", "특징 정보 없음"))
+    selected_vehicle = st.session_state.get("selected_vehicle", "")
+
+    st.text(f"예측된 클러스터: {cluster_id}")
+    st.text(f"고객 유형: {customer_type}")
+    st.text(f"특징: {characteristics}")
+
+    # 고객이 선택한 구입 희망 모델
+    구매한제품 = st.session_state.get("구매한제품", "")
+
+    # 추천 차량 목록에 고객이 고른 모델이 없으면 추가
+    if 구매한제품 and 구매한제품 not in recommended_vehicles:
+        recommended_vehicles.append(구매한제품)
+
+    # 추천 차량 목록 출력
+    st.write("추천 차량 목록:", recommended_vehicles)
 
     if recommended_vehicles:
-        # 버튼을 사용하여 회원 가입 진행
-        submit_button = st.button("회원 가입")
-        if submit_button:  # 버튼 클릭 시
-            st.session_state["step"] = 3  # 고객 정보 저장 단계로 이동
-            # 화면 새로고침
-            st.rerun()
+        # 폼을 사용하여 차량 선택
+        with st.form(key="vehicle_selection_form"):
+            # 세션 상태에 이미 선택된 차량이 있으면 그걸 기본값으로 설정
+            selected_vehicle = st.selectbox("구입 희망 차량을 선택하세요", recommended_vehicles, key="vehicle_select_box", index=recommended_vehicles.index(st.session_state.get("selected_vehicle", recommended_vehicles[0])))
+
+            # 버튼을 사용하여 선택 완료 처리
+            submit_button = st.form_submit_button("선택 완료")
+            if submit_button:
+                # 선택된 차량을 세션 상태에 저장
+                st.session_state["selected_vehicle"] = selected_vehicle
+                st.success(f"{selected_vehicle} 선택 완료! 이제 고객 정보를 저장합니다.")
+                st.session_state["step"] = 3  # 고객 정보 저장 단계로 이동
+                # 화면 새로고침
+                st.rerun()
     else:
         st.warning("추천 차량이 없습니다. 다시 예측을 시도해 주세요.")
 
@@ -216,17 +258,14 @@ def step3_customer_data_storage():
         if st.session_state["phone_error"]:
             st.error("⚠️ 휴대폰 번호는 11자리 숫자여야 합니다. (예: 01012345678)")
         이메일 = st.text_input("이메일 입력", placeholder="필수입니다.", key="email_input")
-
-        # 이메일 주소 형식 검증 (정규식 사용)
-        email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-        if 이메일 and not re.fullmatch(email_regex, 이메일):
+        
+        if 이메일 and ("@" not in 이메일 or "." not in 이메일):
             st.session_state["email_error"] = True
         else:
             st.session_state["email_error"] = False
-
         # 오류 메시지 표시
         if st.session_state["email_error"]:
-            st.error("⚠️ 이메일 주소 형식이 올바르지 않습니다. 예: example@domain.com")
+            st.error("⚠️ 이메일 주소 형식이 올바르지 않습니다. '@'와 '.'을 포함해야 합니다.")
 
         주소 = st.text_input("주소")
         아이디 = st.text_input("아이디")
@@ -253,27 +292,30 @@ def step3_customer_data_storage():
             생년월일 = st.session_state.get("생년월일", "")
             성별 = st.session_state.get("성별", "")
             고객세그먼트 = st.session_state.get("고객세그먼트", "")
+            selected_vehicle = st.session_state.get("selected_vehicle", "")
             차량구분 = st.session_state.get("차량구분", "")
-            친환경차 = st.session_state.get("친환경차", "")
-            구매한제품 = st.session_state.get("구매한제품", "")
+            친환경차 = "여" if selected_vehicle in eco_friendly_models else "부"
+            구매한제품 = selected_vehicle
             제품구매날짜 = st.session_state.get("제품구매날짜", "")
             거래금액 = st.session_state.get("거래금액", "")
             거래방식 = st.session_state.get("거래방식", "")
             구매빈도 = st.session_state.get("제품구매빈도", "")
             제품구매경로 = st.session_state.get("제품구매경로", "")
+            제품출시년월 = launch_dates.get(selected_vehicle, "")
             Cluster = st.session_state.get("Cluster", "")
             연령 = st.session_state.get("연령", "")
             구매빈도= st.session_state.get("구매빈도", "")
             제품출시년월= st.session_state.get("제품출시년월", "")
 
-
+            # 주소에서 시구 추출
+            시구 = extract_sigu(주소)
 
             # 고객 정보 저장
             full_data = pd.DataFrame([[이름, 생년월일, 연령, 성별, 휴대폰번호, 이메일, 주소, 아이디, 가입일, 고객세그먼트, 
-                                       차량구분, 구매한제품, 친환경차, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 제품구매경로, 제품출시년월, Cluster]],
+                                       차량구분, 구매한제품, 친환경차, 제품구매날짜, 거래금액, 거래방식, 구매빈도, 제품구매경로, 제품출시년월, Cluster, 시구]],
                                     columns=["이름", "생년월일", "연령", "성별", "휴대폰번호", "이메일", "주소", "아이디", "가입일", 
                                              "고객 세그먼트", "차량구분", "구매한 제품", "친환경차", "제품 구매 날짜", "거래 금액", 
-                                             "거래 방식", "제품 구매 빈도", "제품 구매 경로", "제품 출시년월", "Cluster"])
+                                             "거래 방식", "제품 구매 빈도", "제품 구매 경로", "제품 출시년월", "Cluster", "시구"])
 
             # CSV 파일에 저장
             file_path = 'data/고객정보.csv'
@@ -286,7 +328,7 @@ def step3_customer_data_storage():
             clicksend_username = st.secrets["CLICKSEND"]["CLICKSEND_USERNAME"]
             clicksend_api_key = st.secrets["CLICKSEND"]["CLICKSEND_API_KEY"]
             to_number = "+82" + 휴대폰번호[1:]  # 국내 번호 형식으로 변환
-            message_body = f"안녕하세요! 고객님을 환영합니다. {이름}님의 클러스터 ID는 {Cluster}입니다."
+            message_body = f"안녕하세요! 고객님을 환영합니다. 선택하신 차량: {st.session_state['selected_vehicle']}"
 
             # ClickSend API 호출 (문자 발송)
             url = "https://rest.clicksend.com/v3/sms/send"
@@ -304,8 +346,8 @@ def step3_customer_data_storage():
                 print("Error sending SMS:", e)
 
             # 이메일 발송
-            promo_email.send_promotion_email(이메일, 이름, Cluster)
-            st.success(f"이메일이 성공적으로 발송되었습니다.{이름}님의 클러스터 ID는 {Cluster}입니다.")
+            promo_email.send_promotion_email(이메일, 이름, st.session_state["selected_vehicle"])
+            st.success("이메일이 성공적으로 발송되었습니다.")
 
 if __name__ == "__main__":
 
