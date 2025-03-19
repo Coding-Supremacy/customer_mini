@@ -9,7 +9,7 @@ def run_description():
 
     
     st.subheader('원본 데이터 확인')
-    df = pd.read_csv('data/고객db_확장본3.csv')
+    df = pd.read_csv('../data/고객db_확장본3.csv')
     st.dataframe(df.head())
     st.markdown("")
     st.markdown("---")
