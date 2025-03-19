@@ -6,6 +6,7 @@ import plotly.colors as pc
 from streamlit_option_menu import option_menu
 from streamlit_autorefresh import st_autorefresh
 
+st.set_page_config(page_title="현대 자동차 고객관리 앱", layout="wide")
 
 # 10초마다 자동 새로고침 (10000 밀리초)
 st_autorefresh(interval=10000, limit=None, key="fizzbuzz")
@@ -307,6 +308,10 @@ def run_eda():
         # 데이터프레임 생성
         df = pd.DataFrame(cluster_data)
 
+        # 인덱스를 숨기고 HTML로 변환하여 출력
+        html_table = df.to_html(index=False)
+
+        # Streamlit에서 표 표시
         # Streamlit에서 표 표시
         st.markdown("""
         <div style="background-color: #e9f7ef; border-left: 6px solid #28a745; padding: 20px; margin-bottom: 20px; border-radius: 4px;">
@@ -317,10 +322,11 @@ def run_eda():
         </div>
         """, unsafe_allow_html=True)
 
-        st.dataframe(df.style.set_table_styles([
-            {"selector": "thead th", "props": [("background-color", "#28a745"), ("color", "white"), ("font-weight", "bold")]},
-            {"selector": "tbody td", "props": [("text-align", "center")]},
-        ]))
+        # 인덱스를 숨기고 HTML로 변환하여 출력
+        html_table = df.to_html(index=False)
+        st.markdown(html_table, unsafe_allow_html=True)
+
+        
 
         if os.path.exists(csv_path):
             df = pd.read_csv(csv_path)

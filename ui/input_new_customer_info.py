@@ -460,13 +460,12 @@ def step3_customer_data_storage():
             file_exists = pd.io.common.file_exists(file_path)
             full_data.to_csv(file_path, mode='a', header=not file_exists, index=False)
 
-            st.text(f"고객 정보가 {file_path}에 저장되었습니다.")
 
             # 문자 발송
             clicksend_username = st.secrets["CLICKSEND"]["CLICKSEND_USERNAME"]
             clicksend_api_key = st.secrets["CLICKSEND"]["CLICKSEND_API_KEY"]
             to_number = "+82" + 휴대폰번호[1:]  # 국내 번호 형식으로 변환
-            message_body = f"안녕하세요! 고객님을 환영합니다. 선택하신 차량: {st.session_state['selected_vehicle']}"
+            message_body = f"안녕하세요, {이름}님! 현대 자동차에서 보내드리는 메시지입니다. 멤버십 가입을 축하드리며, 다양한 혜택과 서비스를 경험해보세요!"
 
             # ClickSend API 호출 (문자 발송)
             url = "https://rest.clicksend.com/v3/sms/send"
@@ -484,7 +483,7 @@ def step3_customer_data_storage():
                 print("Error sending SMS:", e)
 
             # 이메일 발송
-            promo_email.send_promotion_email(이메일, 이름, st.session_state["selected_vehicle"])
+            promo_email.send_welcome_email(이메일, 이름, st.session_state["selected_vehicle"])
             st.success("이메일이 성공적으로 발송되었습니다.")
 
 if __name__ == "__main__":
