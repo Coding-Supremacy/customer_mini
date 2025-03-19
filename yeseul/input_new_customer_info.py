@@ -10,12 +10,6 @@ import time
 import promo_email
 
 
-
-# # secrets.toml에서 client_id와 client_secret 불러오기
-# client_id = st.secrets["KAKAO"]["client_id"]
-# redirect_uri = st.secrets["KAKAO"]["redirect_uri"]
-
-
 # 클러스터 ID에 대한 설명
 cluster_description = {
     0: ("30대 중반 고객", "거래 금액 크고, 제품 구매 빈도 높음, 친환경차 비율 낮음"),
@@ -59,64 +53,6 @@ eco_friendly_models = [
     'NEXO (FE)', 'Avante (CN7 HEV)', 'Grandeur (GN7 HEV)', 'IONIQ (AE EV)', 
     'Tucson (NX4 PHEV)', 'IONIQ 6 (CE)', 'Santa-Fe (MX5 PHEV)'
 ]
-
-# # 카카오 로그인 URL 생성
-# def create_kakao_login_url():
-#     KAKAO_CLIENT_ID = client_id
-#     REDIRECT_URI = redirect_uri  # 리디렉션 URI
-#     KAKAO_AUTH_URL = f"https://kauth.kakao.com/oauth/authorize?response_type=code&client_id={KAKAO_CLIENT_ID}&redirect_uri={REDIRECT_URI}"
-#     return KAKAO_AUTH_URL
-
-# 카카오 OAuth 인증 코드로 액세스 토큰을 얻는 함수
-#앱 키 secret.toml에서 가져오기
-
-
-# def get_access_token_from_kakao(code):
-#     url = "https://kauth.kakao.com/oauth/token"
-
-
-#     data = {
-#         "grant_type": "authorization_code",
-#         "client_id": client_id,  # 카카오 개발자 센터에서 받은 앱 키
-#         "redirect_uri": redirect_uri,  # 리디렉션 URI
-#         "code": code
-#     }
-#     response = requests.post(url, data=data)
-#     if response.status_code == 200:
-#         access_token = response.json().get("access_token")
-#         return access_token
-#     else:
-#         st.error("액세스 토큰 발급 실패")
-#         return None
-
-# # 카카오톡 메시지 전송 함수
-# def send_kakao_message_to_customer(access_token):
-#     kakao_url = "http://pf.kakao.com/_lkVXn"  # 카카오 채널 URL
-#     message = f"안녕하세요! 카카오톡 친구 추가를 통해 다양한 혜택을 확인해보세요! {kakao_url}"
-
-#     url = "https://kapi.kakao.com/v2/api/talk/memo/send"
-#     headers = {
-#         "Authorization": f"Bearer {access_token}",
-#         "Content-Type": "application/json"
-#     }
-
-#     data = {
-#         "template_object": {
-#             "object_type": "text",
-#             "text": message,
-#             "link": {
-#                 "web_url": kakao_url,
-#                 "mobile_web_url": kakao_url
-#             }
-#         }
-#     }
-
-#     response = requests.post(url, headers=headers, json=data)
-
-#     if response.status_code == 200:
-#         st.success("카카오톡 친구 추가 링크가 성공적으로 전송되었습니다!")
-#     else:
-#         st.error(f"메시지 전송 실패: {response.status_code}, {response.text}")
 
 def run_input_customer_info():
     # 고객 개인정보 입력.
@@ -224,11 +160,7 @@ def run_input_customer_info():
             st.text(f"예측된 클러스터: {cluster_id}")
             st.text(f"고객 유형: {customer_type}")
             st.text(f"특징: {characteristics}")
-            # # 예측 후 카카오톡 메시지 전송 (액세스 토큰 필요)
-            # access_token = "YOUR_ACCESS_TOKEN"  # 카카오 로그인 후 얻은 액세스 토큰
 
-            # if access_token:
-            #     send_kakao_message_to_customer(access_token)
 
             # 클러스터링 결과와 고객 정보를 데이터프레임에 추가 (전체 고객 정보도 포함)
             input_data["Cluster"] = cluster_id
@@ -294,3 +226,5 @@ def run_input_customer_info():
                 st.success("이메일이 성공적으로 발송되었습니다.")
     
 
+if __name__ == "__main__":
+    run_input_customer_info()

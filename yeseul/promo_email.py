@@ -15,7 +15,7 @@ EMAIL_ADDRESS = "qhrehlwl111@gmail.com"
 EMAIL_PASSWORD = "nyaw spns mndv gsnb"  # 보안 강화를 위해 앱 비밀번호 사용
 
 # 프로모션 이메일 내용 불러오기
-df = pd.read_csv('junghee/클러스터링별_이메일_UTF8.csv')
+df = pd.read_csv('yeseul/클러스터링별_이메일_UTF8.csv')
 
 # 클러스터 그룹별 랜덤 이메일 선택 함수
 def get_random_email_content(cluster_id):
