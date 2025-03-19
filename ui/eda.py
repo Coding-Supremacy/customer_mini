@@ -6,7 +6,6 @@ import plotly.colors as pc
 from streamlit_option_menu import option_menu
 from streamlit_autorefresh import st_autorefresh
 
-st.set_page_config(page_title="현대 자동차 고객관리 앱", layout="wide")
 
 # 10초마다 자동 새로고침 (10000 밀리초)
 st_autorefresh(interval=10000, limit=None, key="fizzbuzz")
@@ -106,7 +105,7 @@ def run_eda():
 
     pastel_colors = pc.qualitative.Pastel
     # CSV 파일 경로 (필요에 따라 수정)
-    csv_path = r"../data/클러스터링고객데이터_5.csv"
+    csv_path = r"data/클러스터링고객데이터_5.csv"
 
     # 1) 가입 연도 분석
     if selected == "📊 가입 연도 분석":

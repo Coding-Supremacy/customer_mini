@@ -20,7 +20,7 @@ EMAIL_ADDRESS = "qhrehlwl111@gmail.com"
 EMAIL_PASSWORD = "nyaw spns mndv gsnb"  # 보안 강화를 위해 앱 비밀번호 사용
 
 # 프로모션 이메일 내용 불러오기
-df = pd.read_csv('../data/클러스터링_이메일_수정.csv')
+df = pd.read_csv('data/클러스터링_이메일_수정.csv')
 
 # **굵은 글씨** → <b>굵은 글씨</b> 변환 함수
 def convert_markdown_to_html(text):
@@ -242,7 +242,7 @@ print("파일 목록:", os.listdir())  # 현재 디렉토리 내 파일 목록 �
 
 
 # 고객 데이터 불러오기
-customer_df = pd.read_csv('../data/이메일_전송_로그.csv')
+customer_df = pd.read_csv('data/이메일_전송_로그.csv')
 
 # **📌 자동 이메일 발송 스케줄링 기능**
 def send_scheduled_emails():

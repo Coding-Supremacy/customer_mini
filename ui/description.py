@@ -5,9 +5,9 @@ import plotly.express as px
 def run_description():
     
     st.title('데이터 전처리')
-    df = pd.read_csv('../data/고객db_확장본3.csv')  # 원본 데이터
-    df1 = pd.read_csv('../data/description1.csv')  # 전처리 데이터
-    df2 = pd.read_csv("../data/description2.csv")  # 전처리 완료 데이터 = 클러스터링고객데이터_4.csv
+    df = pd.read_csv('data/고객db_확장본3.csv')  # 원본 데이터
+    df1 = pd.read_csv('data/description1.csv')  # 전처리 데이터
+    df2 = pd.read_csv("data/description2.csv")  # 전처리 완료 데이터 = 클러스터링고객데이터_4.csv
     st.subheader('원본 데이터 확인')
     st.dataframe(df.head(),hide_index=True)
 
@@ -221,7 +221,7 @@ launch_dates = {
 
     col1, col2 = st.columns(2)
     with col1:
-        st.image('../img/elbow.png', use_container_width=200)
+        st.image('img/elbow.png', use_container_width=200)
     with col2:
         st.markdown("""<br><br><br><br><br><br>
 엘보우 기법 분석 결과 클러스터 수를 8개로 선정하여 KMeans 클러스터링을 진행하였습니다.<br>

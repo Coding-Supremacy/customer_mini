@@ -13,7 +13,7 @@ def run_home():
 
     
 
-    st.image('../img/home.png', width=1000)
+    st.image('img/home.png', width=1000)
 
     # 📦 3개의 카드 형태로 주요 기능 소개
     col1, col2, col3 = st.columns(3)

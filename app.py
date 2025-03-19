@@ -11,7 +11,10 @@ import os
 
 from ui.description import run_description
 from ui.eda import run_eda
-from ui.input_new_customer_info2 import run_input_customer_info
+from ui.input_new_customer_info import run_input_customer_info
+
+
+
 
     
 st.markdown(
@@ -74,7 +77,7 @@ def run_app():
 
     with st.sidebar:
         selected = option_menu("메뉴", menu, 
-            icons=['house'], menu_icon="cast", default_index=1)
+            icons=['house'], menu_icon="cast", default_index=0)
         
     if selected == '홈' :
         run_home()

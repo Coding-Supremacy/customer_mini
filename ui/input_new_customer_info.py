@@ -6,7 +6,7 @@ import re
 
 import base64
 import requests
-import ui.promo_email
+import ui.promo_email as promo_email
 
 
 # 클러스터 ID에 대한 설명
@@ -73,7 +73,7 @@ def run_input_step1():
     st.title('📋 고객 정보 입력')
 
     # 모델 로드
-    model = joblib.load("../model/model4.pkl")
+    model = joblib.load("model/model4.pkl")
 
     st.info("""
             #### 고객 정보를 입력하고 예측 버튼을 눌러주세요.
@@ -456,7 +456,7 @@ def step3_customer_data_storage():
                                              "거래 방식", "제품 구매 빈도", "제품 구매 경로", "제품 출시년월", "Cluster", "시구"])
 
             # CSV 파일에 저장
-            file_path = 'data/고객정보.csv'
+            file_path = 'data/클러스터링고객데이터_5.csv'
             file_exists = pd.io.common.file_exists(file_path)
             full_data.to_csv(file_path, mode='a', header=not file_exists, index=False)
 
