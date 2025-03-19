@@ -75,11 +75,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown("""
-<h1 style='text-align: center; color: #2E86C1;'>🚗 현대자동차 고객 분석 대시보드</h1>
-<h4 style='text-align: center;'>고객 데이터를 기반으로 한 맞춤형 마케팅 전략</h4>
-<hr>
-""", unsafe_allow_html=True)
+
 
 def run_eda():
     # 분석 종류 선택 메뉴
