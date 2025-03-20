@@ -74,7 +74,6 @@ launch_dates = {
         st.dataframe(df_ecoproduct,hide_index=True)
     st.markdown("""
 구매 모델 중 **FCEV, HEV, EV, PHEV 모델**은 친환경차로 분류하여 **친환경차를 선호하는 고객군**을 파악하고자 하였습니다.
-                
                     """)
 
     st.markdown("---")   
@@ -218,7 +217,7 @@ launch_dates = {
     세그먼트는 클라이언트의 전략적 판단에 따라 고객의 특성을 기반으로 나눈 값으로 보았습니다.<br>
                 클러스터링을 통해 고객을 더 세밀하게 분류한 후, 이를 기존 세그먼트와 결합하면, 비즈니스 전략에 더 유용한 인사이트를 제공할 수 있습니다.<br>
                 """, unsafe_allow_html=True)
-
+    
     col1, col2 = st.columns(2)
     with col1:
         st.image('img/elbow.png', use_container_width=200)
@@ -237,7 +236,7 @@ launch_dates = {
         st.image('img/sc3.png')
     with col2:
         st.markdown("""
-새 고객 데이터 입력 시, SVC 모델로 클러스터링 분류를 진행하였습니다.
+파이프라인을 구축하여 새 고객 데이터가 입력되면 카테고리컬 데이터는 인코딩, 수치형 데이터는 스케일링이 자동으로 수행과, SVC 모델을 통해 클러스터링 및 분류가 이루어지도록 설계하였습니다.
                 """)
     col1, col2 = st.columns(2)
     with col1:
