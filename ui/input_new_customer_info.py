@@ -73,7 +73,7 @@ def run_input_step1():
     st.title('📋 고객 정보 입력')
 
     # 모델 로드
-    model = joblib.load("model/svc_model.pkl")
+    model = joblib.load("model/svm_model.pkl")
 
     st.info("""
             #### 고객 정보를 입력하고 예측 버튼을 눌러주세요.
