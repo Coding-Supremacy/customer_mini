@@ -485,7 +485,3 @@ def step3_customer_data_storage():
             # 이메일 발송
             promo_email.send_welcome_email(이메일, 이름, st.session_state["selected_vehicle"], 가입일)
             st.success("이메일이 성공적으로 발송되었습니다.")
-
-if __name__ == "__main__":
-
-    run_input_customer_info()
