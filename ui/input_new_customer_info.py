@@ -1,3 +1,4 @@
+import time
 import streamlit as st
 import pandas as pd
 import joblib
@@ -495,4 +496,8 @@ def step3_customer_data_storage():
             log_file_path = 'data/이메일_전송_로그.csv'
             file_exist = pd.io.common.file_exists(log_file_path)
             log_entry.to_csv(log_file_path, mode='a', header=not file_exist, index=False)
+            st.session_state["step"] = 1
+            st.success("회원 정보 저장이 완료되었습니다. 초기 화면으로 돌아갑니다.")
+            time.sleep(2)
+            st.rerun()
             
