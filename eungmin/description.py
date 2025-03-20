@@ -3,14 +3,15 @@ import streamlit as st
 import plotly.express as px
 
 def run_description():
-    
     st.title('데이터 전처리')
     df = pd.read_csv('data/고객db_확장본3.csv')  # 원본 데이터
     df1 = pd.read_csv('data/description1.csv')  # 전처리 데이터
     df2 = pd.read_csv("data/description2.csv")  # 전처리 완료 데이터 = 클러스터링고객데이터_4.csv
     st.subheader('원본 데이터 확인')
-    st.dataframe(df.head(),hide_index=True)
 
+    # 데이터프레임의 일부만 HTML로 변환하여 출력
+    df_head_html = df.head(10).to_html(index=False)
+    st.markdown(df_head_html, unsafe_allow_html=True)
     st.markdown("")
     st.markdown("---")
 
@@ -18,7 +19,8 @@ def run_description():
     col1, col2 = st.columns(2)
     with col1:
         vehicle_types = df.loc[df["구매한 제품 (Purchased Product)"] == "Avante (CN7 N)", ["구매한 제품 (Purchased Product)", "차량구분(vehicle types)"]]
-        st.dataframe(vehicle_types,hide_index=True)
+        vehicle_types_html = vehicle_types.head(10).to_html(index=False)
+        st.markdown(vehicle_types_html, unsafe_allow_html=True)
     with col2:
         st.markdown("""<br><br><br><br>
                     샘플 데이터에서는 동일한 제품이라도 차량 구분이 다른 경우가 있었습니다.<br>
@@ -68,10 +70,12 @@ launch_dates = {
             {"Model": "Santa-Fe (MX5 PHEV)", "Type": "플러그인 하이브리드 (PHEV)"}
         ]
         eco_friendly_df = pd.DataFrame(eco_friendly_table)
-        st.dataframe(eco_friendly_df,hide_index=True)
+        eco_friendly_html = eco_friendly_df.to_html(index=False)
+        st.markdown(eco_friendly_html, unsafe_allow_html=True)
     with col2:
-        df_ecoproduct = df2[['구매한 제품', '친환경차']]
-        st.dataframe(df_ecoproduct,hide_index=True)
+        df_ecoproduct = df2[['구매한 제품 (Purchased Product)', '친환경차']]
+        df_ecoproduct_html = df_ecoproduct.head(10).to_html(index=False)
+        st.markdown(df_ecoproduct_html, unsafe_allow_html=True)
     st.markdown("""
 구매 모델 중 **FCEV, HEV, EV, PHEV 모델**은 친환경차로 분류하여 **친환경차를 선호하는 고객군**을 파악하고자 하였습니다.
                 
@@ -151,10 +155,8 @@ launch_dates = {
 
         # Streamlit에서 Plotly 차트 출력
         st.plotly_chart(fig)
-
     with col2:
-        st.markdown("""
-        <br><br><br><br><br><br>
+        st.markdown("""<br><br><br><br><br><br>
         <span style="color:red;">2022, 2023, 2024년 가입자도 신규로 처리</span>된 경우가 많았습니다.<br>
         클라이언트측에서 업데이트를 처리하지 않은것으로 판단하고,<br>2025년 가입자만 신규 세그먼트로<br>
         그 외 신규세그먼트는 일반으로 변경 하였습니다.
@@ -169,20 +171,19 @@ launch_dates = {
         # 총 인원 수를 계산하여 '총 인원' 추가
         total_count1 = segment_counts1.sum()
         segment_counts1['총 인원'] = total_count1
-        st.write(segment_counts1)
+        st.write(segment_counts1)  # 시리즈로 되어 있어 인덱스 숨김 처리 안함
         st.markdown("""
         변경 전 고객 세그먼트 분포  
         """)
-
     with col2:
         # '고객 세그먼트 (Customer Segment)'의 value_counts 결과를 순서대로 맞추기
-        segment_counts2 = df2['고객 세그먼트'].value_counts().reindex(category_order).fillna(0).astype(int)
+        segment_counts2 = df2['고객 세그먼트 (Customer Segment)'].value_counts().reindex(category_order).fillna(0).astype(int)
 
-        # 총 인원 수를 계산하여 '총 인원'
+        # 총 인원 수를 계산하여 '총 인원' 추가
         total_count2 = segment_counts2.sum()
         segment_counts2['총 인원'] = total_count2
 
-        st.write(segment_counts2)
+        st.write(segment_counts2)  # 시리즈로 되어 있어 인덱스 숨김 처리 안함
         st.markdown("""
         변경 후 고객 세그먼트 분포  
         """)
@@ -192,11 +193,13 @@ launch_dates = {
     st.markdown("""고객 생년월일 데이터를 25년 3월 기준 연령으로 변환 하였습니다.""")
     merged_df = pd.concat([df['생년월일 (Date of Birth)'], df2['연령']], axis=1)
     merged_df.columns = ['원본파일의 생년월일 (Date of Birth)', '변환 후 연령']
-    st.dataframe(merged_df,hide_index=True)
+    merged_df_html = merged_df.head(10).to_html(index=False)
+    st.markdown(merged_df_html, unsafe_allow_html=True)
 
     st.subheader('전처리 후 고객정보 데이터셋 📊')
-    df2['휴대폰번호'] = df2['휴대폰번호'].astype(str).apply(lambda x: '0' + x)
-    st.dataframe(df2.head())
+    df2['휴대폰번호 (Phone Number)'] = df2['휴대폰번호 (Phone Number)'].astype(str).apply(lambda x: '0' + x)
+    df2_head_html = df2.head(10).to_html(index=False)
+    st.markdown(df2_head_html, unsafe_allow_html=True)
 
     st.markdown("---")
     st.title("KMeans 클러스터링 진행")
@@ -227,7 +230,6 @@ launch_dates = {
 엘보우 기법 분석 결과 클러스터 수를 8개로 선정하여 KMeans 클러스터링을 진행하였습니다.<br>
                     클러스터링 결과는 EDA페이지에서 확인할 수 있습니다.<br>
                     """, unsafe_allow_html=True)
-        
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     run_description()

@@ -176,9 +176,3 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-filtered_customers.csv
-ho.ipynb
-elbow.png
-customer_segment/고객 세그먼트 대신 Kmeans 클러스터링으로 재처리 한 이유.ipynb
-ui/input_new_customer_info2.py
-고객세그먼트 수정.ipynb
