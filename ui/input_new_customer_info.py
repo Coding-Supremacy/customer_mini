@@ -100,7 +100,7 @@ def run_input_step1():
             if 생년월일:
                 today = datetime.today()
                 연령 = today.year - 생년월일.year - ((today.month, today.day) < (생년월일.month, 생년월일.day))
-            고객세그먼트 = st.selectbox("고객 세그먼트 선택", ["신규", "VIP", "일반", "이탈가능"], index=0)
+            고객세그먼트 = st.selectbox("고객 세그먼트 선택", ["신규", "vip", "일반", "이탈가능"], index=0)
             거래금액 = st.number_input("고객 예산 입력", min_value=10000000, step=1000000)
             구매빈도 = st.number_input("제품 구매 빈도 입력", min_value=1, step=1, value=1)
 
