@@ -7,3 +7,4 @@ streamlit_autorefresh
 joblib
 schedule
 scikit-learn
+time
