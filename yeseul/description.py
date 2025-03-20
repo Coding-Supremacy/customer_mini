@@ -3,7 +3,7 @@ import streamlit as st
 import plotly.express as px
 
 def run_description():
-    
+    st.set_page_config(layout="wide")
     st.title('데이터 전처리')
     df = pd.read_csv('data/고객db_확장본3.csv')  # 원본 데이터
     df1 = pd.read_csv('data/description1.csv')  # 전처리 데이터
