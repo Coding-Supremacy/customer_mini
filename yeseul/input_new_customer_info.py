@@ -85,7 +85,7 @@ def run_input_customer_info():
 
 def run_input_step1():
     st.title('📋 고객 정보 입력')
-    model = joblib.load("model/model4.pkl")
+    model = joblib.load("model/svc_model.pkl")
     st.info("고객 정보를 모두 입력하고 예측 버튼을 눌러주세요.")
     with st.form(key="customer_info_form"):
         col1, col2 = st.columns([1, 1])
