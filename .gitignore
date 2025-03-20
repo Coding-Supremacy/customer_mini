@@ -1,10 +1,18 @@
 .streamlit/
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
+<<<<<<< Updated upstream
+=======
+.toml
+김예슬개인/
+>>>>>>> Stashed changes
 
 # C extensions
 *.so
@@ -176,3 +184,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+<<<<<<< Updated upstream
+=======
+filtered_customers.csv
+
+>>>>>>> Stashed changes
