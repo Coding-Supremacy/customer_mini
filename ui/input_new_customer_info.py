@@ -412,7 +412,7 @@ def step3_customer_data_storage():
         가입일 = st.date_input("가입일")
 
         # 고객 정보 저장하기 버튼
-        submit_button = st.form_submit_button("고객정보 분석하기")
+        submit_button = st.form_submit_button("고객정보 저장하기")
 
         if submit_button:
             if not (이름 and 휴대폰번호 and 이메일 and 주소 and 아이디 and 가입일):

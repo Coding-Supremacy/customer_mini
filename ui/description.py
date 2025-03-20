@@ -78,7 +78,7 @@ launch_dates = {
 
     st.markdown("---")   
 
-    st.subheader('고객 세그먼트 수정 🙆')
+    st.subheader('RFM 고객 세그먼트 분석 및 수정 🙆')
     col1, col2 = st.columns(2)
 
     with col1:
@@ -122,8 +122,7 @@ launch_dates = {
 
     st.markdown("""
                 📌 구매빈도 횟수와 무관해보이는 세그먼트 구분<br>📌 일반, 신규 거래금액과 크게 차이가 없는 이탈가능 세그먼트의 거래금액 분포<br>
-                고객 세그먼트 기준을 모르는 개발팀 입장에서는 어떤 기준으로 VIP, 이탈가능으로 분류했는지 모호합니다. <br>
-                하지만 클라이언트 측 고객관리팀에서 **VIP, 이탈가능 세그먼트를 선정한 기준이 있을것으로 판단**하고 세그먼트를 유지하였습니다.  
+                이탈가능 고객에게 적극적인 마케팅을 할 경우 VIP 고객이 될 수 있다는 잠재적 가능성이 있다고 보여집니다. 
     """, unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
@@ -195,7 +194,7 @@ launch_dates = {
 
     st.subheader('전처리 후 고객정보 데이터셋 📊')
     df2['휴대폰번호'] = df2['휴대폰번호'].astype(str).apply(lambda x: '0' + x)
-    st.dataframe(df2.head())
+    st.dataframe(df2.head(),hide_index=True)
 
     st.markdown("---")
     st.title("KMeans 클러스터링 진행")
