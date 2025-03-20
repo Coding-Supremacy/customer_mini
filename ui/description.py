@@ -178,7 +178,7 @@ launch_dates = {
         # '고객 세그먼트 (Customer Segment)'의 value_counts 결과를 순서대로 맞추기
         segment_counts2 = df2['고객 세그먼트'].value_counts().reindex(category_order).fillna(0).astype(int)
 
-        # 총 인원 수를 계산하여 '총 인원' 추가
+        # 총 인원 수를 계산하여 '총 인원'
         total_count2 = segment_counts2.sum()
         segment_counts2['총 인원'] = total_count2
 
