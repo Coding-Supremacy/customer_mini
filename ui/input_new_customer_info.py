@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import pandas as pd
 import joblib
@@ -487,12 +488,18 @@ def step3_customer_data_storage():
             st.success("이메일이 성공적으로 발송되었습니다.")
 
 
-            # 이메일 전송 로그 저장
+            # 📌 이메일 전송 로그 저장
             log_entry = pd.DataFrame([[이메일, 이름, Cluster, datetime.now().strftime("%Y-%m-%d %H:%M:%S")]],
                                     columns=["이메일", "이름", "클러스터 ID", "전송 시간"])
-            
-            # CSV 파일에 저장
+
+            # 📌 CSV 파일 경로
             log_file_path = 'data/이메일_전송_로그.csv'
-            file_exist = pd.io.common.file_exists(log_file_path)
-            log_entry.to_csv(log_file_path, mode='a', header=not file_exist, index=False)
-            
+
+            # 📌 파일이 없으면 새로 생성
+            if not os.path.exists(log_file_path):
+                log_entry.to_csv(log_file_path, mode='w', header=True, index=False)  # 새로운 파일 생성
+                print(f"📄 새 이메일 전송 로그 파일 생성됨: {log_file_path}")
+            else:
+                log_entry.to_csv(log_file_path, mode='a', header=False, index=False)  # 기존 파일에 추가
+
+            print("✅ 이메일 전송 로그 저장 완료!")

@@ -1,5 +1,5 @@
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -17,29 +17,37 @@ import schedule
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 EMAIL_ADDRESS = "qhrehlwl111@gmail.com"
-EMAIL_PASSWORD = "nyaw spns mndv gsnb"  # 보안 강화를 위해 앱 비밀번호 사용
+EMAIL_PASSWORD = "peyhgyaxtewzhfmi"  # 보안 강화를 위해 앱 비밀번호 사용
 
-# 프로모션 이메일 내용 불러오기
-df = pd.read_csv('data/클러스터링_이메일_수정.csv')
+try:
+    print("📢 SMTP 서버 연결 시도 중 (TLS)...")
+    server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    server.starttls()  # 보안 연결 활성화
+    server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+    print("✅ SMTP 로그인 성공!")
+    server.quit()
+except Exception as e:
+    print(f"🚨 SMTP 로그인 실패: {str(e)}")
 
-# **굵은 글씨** → <b>굵은 글씨</b> 변환 함수
-def convert_markdown_to_html(text):
-    return re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text)
+
 
 # 클러스터 그룹별 랜덤 이메일 선택 함수
 def get_random_email_content(cluster_id):
-    # 클러스터 ID에 해당하는 이메일 본문과 제목을 랜덤하게 선택하여 반환
+    # 📌 CSV에서 매번 새롭게 불러오기 (랜덤화 유지)
+    df = pd.read_csv('data/클러스터링_이메일_수정.csv')
 
-    df["Email Content"] = df["Email Content"].apply(convert_markdown_to_html)
-    # 해당 클러스터 ID의 데이터 필터링
+    # 📌 클러스터 ID에 해당하는 이메일 필터링
     cluster_emails = df[df["Cluster ID"] == cluster_id][["Email Content", "Subject"]]
 
-    if not cluster_emails.empty:
-        # 랜덤으로 하나 선택
-        selected_email = cluster_emails.sample(n=1).iloc[0]
-        return selected_email["Email Content"], selected_email["Subject"]
-    else:
+    if cluster_emails.empty:
         return "맞춤 프로모션 정보를 찾을 수 없습니다.", "제목 없음"
+
+    # 📌 굵은 글씨 변환 (필터링 후 적용)
+    cluster_emails["Email Content"] = cluster_emails["Email Content"].apply(lambda x: re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', x))
+
+    # 📌 랜덤으로 하나 선택 후 반환
+    selected_email = cluster_emails.sample(n=1).iloc[0]
+    return selected_email["Email Content"], selected_email["Subject"]
 
 def send_promotion_email(이메일, 이름, cluster_id):
 
@@ -124,11 +132,13 @@ def send_promotion_email(이메일, 이름, cluster_id):
         
 
     except Exception as e:
-        print(f"🚨 이메일 전송 실패: {str(e)}")
+        print(f"🚨 프로모션 이메일 전송 실패: {str(e)}")
 
 
 
 def send_welcome_email(이메일, 이름, 아이디, 가입일):
+    print(f"📢 {이름}님에게 환영 이메일을 보내는 중...")
+
     """회원가입 환영 이메일 자동 발송"""
     subject = "[현대자동차] 회원가입을 환영합니다! 🚗"
     
@@ -229,33 +239,51 @@ def send_welcome_email(이메일, 이름, 아이디, 가입일):
             server.sendmail(EMAIL_ADDRESS, 이메일, msg.as_string())
         print(f"✅ 회원가입 환영 이메일 전송 완료: {이메일}")
 
-        
-
     except Exception as e:
-        print(f"🚨 이메일 전송 실패: {str(e)}")
+        print(f"🚨 환영 이메일 전송 실패: {str(e)}")
 
 
 
-print("현재 디렉토리:", os.getcwd())  # 현재 디렉토리 출력
-print("파일 목록:", os.listdir())  # 현재 디렉토리 내 파일 목록 출력
 
 
+# **📌 이메일 전송 로그 파일 경로**
+log_file_path = "data/이메일_전송_로그.csv"
 
-# 고객 데이터 불러오기
-customer_df = pd.read_csv('data/이메일_전송_로그.csv')
-
-# **📌 자동 이메일 발송 스케줄링 기능**
+# **📌 자동 이메일 발송 스케줄링 기능 (중복 방지 + 반복문 종료)**
 def send_scheduled_emails():
     print("📢 정기 이메일 발송 시작!")
 
-    
-     # 하루 최대 10명에게만 이메일 전송 (랜덤 샘플)
-    customers_to_email = customer_df.sample(n=min(10, len(customer_df)))
+    # 📌 CSV 파일이 존재하는지 확인
+    if not os.path.exists(log_file_path):
+        print("🚨 이메일 전송 로그 파일이 없습니다. 새로운 로그 파일을 생성합니다.")
+        pd.DataFrame(columns=["이메일", "이름", "클러스터 ID", "전송 시간"]).to_csv(log_file_path, index=False)
 
-    for _, row in customers_to_email.iterrows():
+    # 📌 이메일 전송 로그 불러오기
+    customer_df = pd.read_csv(log_file_path)
+
+    if customer_df.empty:
+        print("✅ 이메일을 보낼 대상이 없습니다.")
+        return
+
+    # 📌 현재 시간 가져오기
+    now = datetime.now()
+
+    # 📌 5분 이상 경과한 고객만 필터링
+    customer_df["전송 시간"] = pd.to_datetime(customer_df["전송 시간"], errors='coerce')
+    eligible_customers = customer_df[customer_df["전송 시간"] + timedelta(minutes=5) <= now]
+
+    if eligible_customers.empty:
+        print("✅ 5분이 지나지 않아 보낼 고객이 없습니다.")
+        return
+
+    # 📌 이메일 전송
+    for idx, row in eligible_customers.iterrows():
         send_promotion_email(row["이메일"], row["이름"], row["클러스터 ID"])
+        time.sleep(5)  # 📌 5초 대기 (Gmail 차단 방지)
 
-    print("✅ 정기 이메일 발송 완료!")
+    
+    print("✅ 모든 고객에게 이메일 전송 완료! 다음 실행까지 대기합니다.")
+
 
 # **📌 스케줄 설정 (매일 오전 9시 실행)**
 schedule.every(5).minutes.do(send_scheduled_emails)
