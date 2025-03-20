@@ -234,6 +234,8 @@ def send_welcome_email(이메일, 이름, 아이디, 가입일):
     except Exception as e:
         print(f"🚨 이메일 전송 실패: {str(e)}")
 
+    
+
 
 
 print("현재 디렉토리:", os.getcwd())  # 현재 디렉토리 출력
