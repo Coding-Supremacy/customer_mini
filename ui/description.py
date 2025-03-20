@@ -228,6 +228,25 @@ launch_dates = {
                     클러스터링 결과는 EDA페이지에서 확인할 수 있습니다.<br>
                     """, unsafe_allow_html=True)
         
+    st.markdown("---")
 
-if __name__ == "__main__":
-    run_description()
+    st.subheader("SVC 모델을 활용한 신규 고객 클러스터링 분류")
+
+    st.subheader("고객 세그먼트별 프로모션 이메일 발송")
+    st.markdown("""
+분석 결과를 토대로 고객 클러스터링별 프로모션 이메일이 발송되도록 설정하였습니다.<br>
+
+""")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image('img/sc1.png', use_container_width=True)
+        st.markdown("""
+0번 클러스터 프로모션 메일 예시
+
+""")
+    with col2:
+        st.image('img/sc2.png', use_container_width=True)
+        st.markdown("""
+1번 클러스터 프로모션 메일 예시
+        """)
+        
