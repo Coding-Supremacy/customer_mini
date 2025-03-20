@@ -444,6 +444,16 @@ def step3_customer_data_storage():
             promo_email.send_promotion_email(이메일, 이름, selected_vehicle)
             st.success("📧 이메일이 성공적으로 발송되었습니다.")
 
+            # 이메일 전송 로그 저장
+            log_entry = pd.DataFrame([[이메일, 이름, Cluster, datetime.now().strftime("%Y-%m-%d %H:%M:%S")]],
+                                    columns=["이메일", "이름", "클러스터 ID", "전송 시간"])
+            
+            # CSV 파일에 저장
+            log_file_path = 'data/이메일_전송_로그.csv'
+            file_exist = pd.io.common.file_exists(log_file_path)
+            log_entry.to_csv(log_file_path, mode='a', header=not file_exist, index=False)
+            
+
 if __name__ == "__main__":
 
     run_input_customer_info()
