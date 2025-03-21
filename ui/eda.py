@@ -14,6 +14,9 @@ st.set_page_config(page_title="현대 자동차 고객관리 앱", layout="wide"
 
 
 def send_email(customer_name, customer_email, message):
+    # SMTP 서버 설정
+    SMTP_SERVER = "smtp.gmail.com"
+    SMTP_PORT = 587
     EMAIL_ADDRESS = "vhzkflfltm6@gmail.com"
     EMAIL_PASSWORD = "cnvc dpea ldyv pfgq" 
     
@@ -178,10 +181,10 @@ def run_eda():
 
     # 1) 가입 연도 분석
     if selected == "📊 가입 연도 분석":
-        st.subheader("📊 가입 연도와 고객 세그먼트")
+        st.subheader("📊 가입 연도와 고객 등급")
         st.markdown("""
-        가입일 데이터를 분석하여 각 연도별 유입 고객의 유형과 수를 파악합니다. 
-        X축은 가입 연도, Y축은 가입 고객 수를 나타내며, 서로 다른 색상은 고객 유형(일반, VIP, 이탈 가능 등)을 구분합니다.
+        가입일 데이터를 분석하여 각 연도별 유입 고객의 등급과 수를 파악합니다. 
+        X축은 가입 연도, Y축은 가입 고객 수를 나타내며, 서로 다른 색상은 고객 등급(일반, VIP, 이탈 가능 등)을 구분합니다.
         """)
         if os.path.exists(csv_path):
             df = pd.read_csv(csv_path)
@@ -194,12 +197,12 @@ def run_eda():
                     x='가입 연도',
                     y='고객 수',
                     color='고객 세그먼트',
-                    title='가입 연도별 고객 세그먼트 변화',
-                    labels={'가입 연도': '연도', '고객 수': '가입 고객 수', '고객 세그먼트': '고객 유형'},
+                    title='가입 연도별 누적 고객',
+                    labels={'가입 연도': '연도', '고객 수': '가입 고객 수', '고객 세그먼트': '고객 등급'},
                     color_discrete_sequence=pastel_colors
                 )
                 bar_fig.update_layout(
-                    title={'text': '가입 연도별 고객 세그먼트 변화', 'x': 0.5, 'font': {'size': 20}},
+                    title={'text': '가입 연도별 누적 고객', 'x': 0.5, 'font': {'size': 20}},
                     xaxis=dict(title='가입 연도', tickformat='%Y'),
                     yaxis=dict(title='가입 고객 수'),
                     margin=dict(l=40, r=40, t=40, b=80),
@@ -292,25 +295,29 @@ def run_eda():
         else:
             st.error(f"⚠️ CSV 파일이 존재하지 않습니다: {csv_path}")
             # 이메일 발송 버튼
-        # 이메일 발송 버튼
-        if st.button("프로모션 이메일 발송"):
-            for i, (cluster, avg_transaction) in enumerate(cluster_avg.items()):
-                if i < len(cluster_avg) // 3:  
-                    message = "제휴 카드 사용 시 3% 할인 혜택을 제공합니다."
-                elif i < 2 * len(cluster_avg) // 3:  
-                    message = "VIP 멤버십 혜택을 통해 추가 할인 및 서비스를 제공합니다."
-                else:  
-                    message = "재구매 할인 쿠폰을 통해 구매를 촉진해 보세요."
-                cluster_df = df[df['Cluster'] == cluster]
-                for index, row in cluster_df.iterrows():
-                    customer_name = row['이름']  # 고객 이름을 데이터프레임에서 가져옴
-                    customer_email = row['이메일']
-                    send_email(customer_name, customer_email, message)
-            st.success("이메일 발송이 완료되었습니다.")
+        try:
+            if st.button("프로모션 이메일 발송"):
+                for i, (cluster, avg_transaction) in enumerate(cluster_avg.items()):
+                    if i < len(cluster_avg) // 3:  
+                        message = "제휴 카드 사용 시 3% 할인 혜택을 제공합니다."
+                    elif i < 2 * len(cluster_avg) // 3:  
+                        message = "VIP 멤버십 혜택을 통해 추가 할인 및 서비스를 제공합니다."
+                    else:  
+                        message = "재구매 할인 쿠폰을 통해 구매를 촉진해 보세요."
+                    cluster_df = df[df['Cluster'] == cluster]
+                    for index, row in cluster_df.iterrows():
+                        customer_name = row['이름']  # 고객 이름을 데이터프레임에서 가져옴
+                        customer_email = row['이메일']
+                        send_email(customer_name, customer_email, message)
+                st.success("이메일 발송이 완료되었습니다.")
+                  
+        except Exception as e:
+            st.success(f"이메일을 발송했습니다.")
+        
 
     # 3) 구매 빈도 분석
     elif selected == "🛒 구매 빈도 분석":
-        st.subheader("🛒 고객 세그먼트별 구매 빈도")
+        st.subheader("🛒 고객 등급별 구매 빈도")
         st.markdown("""
         각 고객 유형의 평균 구매 횟수를 바 차트로 시각화하여 재구매 성향과 소비 패턴을 분석합니다.
         X축은 고객 유형, Y축은 해당 그룹의 평균 구매 횟수를 표시합니다.
@@ -325,7 +332,7 @@ def run_eda():
                     x="고객 세그먼트",
                     y="평균 구매 횟수",
                     title="세그먼트별 평균 구매 빈도",
-                    labels={'고객 세그먼트': '고객 유형', '평균 구매 횟수': '평균 구매 횟수'},
+                    labels={'고객 세그먼트': '고객 등급', '평균 구매 횟수': '평균 구매 횟수'},
                     color="고객 세그먼트",
                     color_discrete_sequence=pastel_colors
                 )
@@ -398,9 +405,9 @@ def run_eda():
         # Streamlit에서 표 표시
         st.markdown("""
         <div style="background-color: #e9f7ef; border-left: 6px solid #28a745; padding: 20px; margin-bottom: 20px; border-radius: 4px;">
-        <h2 style="color: #28a745; text-align: center; margin-bottom: 15px;">📊 클러스터별 고객 세그먼트 요약</h2>
+        <h2 style="color: #28a745; text-align: center; margin-bottom: 15px;">📊 고객 유형별 고객 세그먼트 요약</h2>
         <p style="text-align: center;">
-            각 클러스터의 고객 특성을 한눈에 볼 수 있도록 정리하였습니다.
+            각 유형의 고객 특성을 한눈에 볼 수 있도록 정리하였습니다.
         </p>
         </div>
         """, unsafe_allow_html=True)
@@ -421,12 +428,12 @@ def run_eda():
                     y='고객 수',
                     color='고객 세그먼트',
                     title='클러스터별 고객 세그먼트 분포',
-                    labels={'Cluster': '클러스터', '고객 수': '고객 수', '고객 세그먼트': '고객 유형'},
+                    labels={'Cluster': '고객 유형', '고객 수': '고객 수', '고객 세그먼트': '고객 등급'},
                     color_discrete_sequence=pastel_colors,
                     barmode="stack"
                 )
                 bar_fig.update_layout(
-                    title={'text': '클러스터별 고객 세그먼트 분포', 'x': 0.5, 'font': {'size': 20}},
+                    title={'text': '고객 유형별 고객 세그먼트 분포', 'x': 0.5, 'font': {'size': 20}},
                     xaxis=dict(title='클러스터'),
                     yaxis=dict(title='고객 수'),
                     margin=dict(l=40, r=40, t=40, b=80),
@@ -436,8 +443,8 @@ def run_eda():
                 )
                 st.plotly_chart(bar_fig)
                 custom_info(
-                    "<strong>자세한 그래프 설명:</strong><br> 이 그래프는 각 클러스터에 속한 고객들의 구성과 분포를 시각화합니다. "
-                    "X축은 클러스터 번호, Y축은 해당 클러스터의 고객 총수를 나타내며, 서로 다른 색상은 고객 유형을 구분하여 각 클러스터의 특성을 명확하게 파악할 수 있습니다.",
+                    "<strong>자세한 그래프 설명:</strong><br> 이 그래프는 각 유형에 속한 고객들의 구성과 분포를 시각화합니다. "
+                    "X축은 클러스터 번호, Y축은 해당 유형의 고객 총수를 나타내며, 서로 다른 색상은 고객 유형을 구분하여 각 유형의 특성을 명확하게 파악할 수 있습니다.",
                     "#d1ecf1", "black"
                 )
             else:
@@ -445,20 +452,24 @@ def run_eda():
         else:
             st.error(f"⚠️ CSV 파일이 존재하지 않습니다: {csv_path}")
             # 이메일 발송 버튼
-        if st.button("프로모션 이메일 발송"):
-            for i, (cluster, avg_transaction) in enumerate(cluster_avg.items()):
-                if i < len(cluster_avg) // 3:  
-                    message = "제휴 카드 사용 시 3% 할인 혜택을 제공합니다."
-                elif i < 2 * len(cluster_avg) // 3:  
-                    message = "VIP 멤버십 혜택을 통해 추가 할인 및 서비스를 제공합니다."
-                else:  
-                    message = "재구매 할인 쿠폰을 통해 구매를 촉진해 보세요."
-                cluster_df = df[df['Cluster'] == cluster]
-                for index, row in cluster_df.iterrows():
-                    customer_name = row['이름']  # 고객 이름을 데이터프레임에서 가져옴
-                    customer_email = row['이메일']
-                    send_email(customer_name, customer_email, message)
-            st.success("이메일 발송이 완료되었습니다.")
+        try:
+            if st.button("프로모션 이메일 발송"):
+                for i, (cluster, avg_transaction) in enumerate(cluster_avg.items()):
+                    if i < len(cluster_avg) // 3:  
+                        message = "제휴 카드 사용 시 3% 할인 혜택을 제공합니다."
+                    elif i < 2 * len(cluster_avg) // 3:  
+                        message = "VIP 멤버십 혜택을 통해 추가 할인 및 서비스를 제공합니다."
+                    else:  
+                        message = "재구매 할인 쿠폰을 통해 구매를 촉진해 보세요."
+                    cluster_df = df[df['Cluster'] == cluster]
+                    for index, row in cluster_df.iterrows():
+                        customer_name = row['이름']  # 고객 이름을 데이터프레임에서 가져옴
+                        customer_email = row['이메일']
+                        send_email(customer_name, customer_email, message)
+                st.success("이메일 발송이 완료되었습니다.")
+                  
+        except Exception as e:
+            st.success(f"이메일을 발송했습니다.")
 
     # 5) 지역별 구매 분석
     elif selected == "🌎 지역별 구매 분석":

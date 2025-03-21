@@ -330,10 +330,7 @@ def step2_vehicle_selection():
         }
     }
 
-    st.text(f"예측된 클러스터: {cluster_id}")
-    st.text("고객의 성향에 맞춘 추천차량 목록입니다.")
-    st.text(f"고객 유형: {customer_type}")
-    st.text(f"특징: {characteristics}")
+    st.info("고객님의 성향에 맞춘 추천차량 목록입니다.")
 
     # 고객이 선택한 구입 희망 모델
     구매한제품 = st.session_state.get("구매한제품", "")
