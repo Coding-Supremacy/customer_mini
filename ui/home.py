@@ -23,7 +23,7 @@ def run_home():
 
     with col2:
         st.write("#### 🤖  예측")
-        st.success("머신러닝 모델을 활용하여 고객 행동을 예측합니다.")
+        st.success("머신러닝 모델을 활용하여 고객 유형을 예측합니다.")
 
     with col3:
         st.write("#### ✉️ 프로모션 발송")
