@@ -162,7 +162,6 @@ def run_eda():
         else:
             st.error(f"⚠️ CSV 파일이 존재하지 않습니다: {csv_path}")
 
-    # 2) 거래 금액 분석
     elif selected == "💰 거래 금액 분석":
         st.subheader("💰 고객 세그먼트별 거래 금액")
         st.markdown("""
@@ -171,21 +170,25 @@ def run_eda():
         """)
         if os.path.exists(csv_path):
             df = pd.read_csv(csv_path)
-            if {'고객 세그먼트', '거래 금액'}.issubset(df.columns):
+            if {'Cluster', '거래 금액'}.issubset(df.columns):
+                # 클러스터 번호에 +1을 더한 새로운 열 생성
+                df['Cluster_Display'] = df['Cluster'] + 1
+                
+                # 클러스터가 8개인 경우, 색상 시퀀스를 조정합니다.
                 box_fig = px.box(
                     df,
-                    x="고객 세그먼트",
+                    x="Cluster_Display",  # 새로운 열을 x축으로 사용
                     y="거래 금액",
-                    title="세그먼트별 거래 금액 분포",
-                    labels={'고객 세그먼트': '고객 유형', '거래 금액': '거래 금액(원)'},
-                    color="고객 세그먼트",
-                    color_discrete_sequence=pastel_colors
+                    title="클러스터별 거래 금액 분포",
+                    labels={'Cluster_Display': '고객 유형', '거래 금액': '거래 금액(원)'},
+                    color="Cluster_Display",  # 각 클러스터별로 색상이 다르게 나타나도록 설정
+                    color_discrete_sequence=px.colors.qualitative.Pastel[:8]  # 8개의 색상 사용
                 )
                 box_fig.update_layout(
-                    title={'text': '세그먼트별 거래 금액 분포', 'x': 0.5, 'font': {'size': 20}},
-                    xaxis=dict(title='고객 유형'),
+                    title={'text': '클러스터별 거래 금액 분포', 'x': 0.5, 'font': {'size': 20}},
+                    xaxis=dict(title='고객 유형', tickangle=-45),  # x축 레이블을 45도 기울여 정렬
                     yaxis=dict(title='거래 금액(원)'),
-                    margin=dict(l=40, r=40, t=40, b=80),
+                    margin=dict(l=40, r=40, t=40, b=120),  # x축 레이블이 잘리지 않도록 여백을 늘림
                     plot_bgcolor='#f4f4f9',
                     paper_bgcolor='#ffffff',
                     font=dict(size=12)
@@ -196,33 +199,23 @@ def run_eda():
                     "이를 통해 각 고객군의 소비 패턴을 비교 분석할 수 있어 마케팅 전략 수립에 큰 도움이 됩니다.",
                     "#d1ecf1", "black"
                 )
-                avg_transaction = df['거래 금액'].mean()
-                if avg_transaction >= 10000:
-                    custom_info("프로모션 제안: 거래 금액이 매우 높습니다. → 초고가 상품, 맞춤형 컨시어지, 프리미엄 이벤트 강화.",
-                               "#d1e7dd", "darkgreen")
-                elif avg_transaction >= 8000:
-                    custom_info("프로모션 제안: 거래 금액이 높습니다. → 프리미엄 멤버십 혜택 확대 및 VIP 특별 초청 행사 고려.",
-                               "#cce5ff", "darkblue")
-                elif avg_transaction >= 5000:
-                    custom_info("프로모션 제안: 거래 금액이 양호합니다. → VIP 추가 할인 및 업셀링, 맞춤 마케팅 컨설팅 제공 검토.",
-                               "#d4edda", "darkgreen")
-                elif avg_transaction >= 3000:
-                    custom_info("프로모션 제안: 거래 금액이 보통 이상입니다. → 할인 쿠폰, 포인트 적립, 단골 고객 이벤트 진행 추천.",
-                               "#fff3cd", "darkorange")
-                elif avg_transaction >= 2000:
-                    custom_info("프로모션 제안: 거래 금액이 보통입니다. → 소액 구매 고객 대상으로 업셀링 및 크로스셀링 프로모션 적용.",
-                               "#ffeeba", "darkorange")
-                elif avg_transaction >= 1000:
-                    custom_info("프로모션 제안: 거래 금액이 낮습니다. → 재구매 할인 쿠폰, 적립 이벤트, 타겟 마케팅 통한 충성도 향상.",
-                               "#f8d7da", "darkred")
-                elif avg_transaction >= 500:
-                    custom_info("프로모션 제안: 거래 금액이 매우 낮습니다. → 가격 경쟁력 강화, 소액 구매 프로모션, 신규 고객 확보 전략 집중.",
-                               "#f5c6cb", "darkred")
-                else:
-                    custom_info("프로모션 제안: 거래 금액이 극히 낮습니다. → 전면적 가격 정책 재검토 및 마케팅 전략 전환 필요.",
-                               "#f5c6cb", "darkred")
+                
+                # 각 클러스터별 평균 거래 금액 계산
+                cluster_avg = df.groupby('Cluster')['거래 금액'].mean().sort_values(ascending=False)
+                
+                # 클러스터별로 거래 금액 평균을 비교하여 프로모션 제안
+                for i, (cluster, avg_transaction) in enumerate(cluster_avg.items()):
+                    if i < len(cluster_avg) // 3:  # 상위 1/3 클러스터
+                        custom_info(f"{cluster + 1}번 유형 고객 프로모션 제안: 거래 금액이 가장 높습니다. → 초고가 상품, 맞춤형 컨시어지, 프리미엄 이벤트 강화.",
+                                "#d1e7dd", "darkgreen")
+                    elif i < 2 * len(cluster_avg) // 3:  # 중위 클러스터
+                        custom_info(f"{cluster + 1}번 유형 고객 프로모션 제안: 거래 금액이 중간 수준입니다. → VIP 추가 할인 및 업셀링, 맞춤 마케팅 컨설팅 제공 검토.",
+                                "#d4edda", "darkgreen")
+                    else:  # 하위 클러스터
+                        custom_info(f"{cluster + 1}번 유형 고객 프로모션 제안: 거래 금액이 낮습니다. → 재구매 할인 쿠폰, 적립 이벤트, 타겟 마케팅 통한 충성도 향상.",
+                                "#f8d7da", "darkred")
             else:
-                st.error("필요한 컬럼('고객 세그먼트', '거래 금액')이 CSV 파일에 없습니다.")
+                st.error("필요한 컬럼('Cluster', '거래 금액')이 CSV 파일에 없습니다.")
         else:
             st.error(f"⚠️ CSV 파일이 존재하지 않습니다: {csv_path}")
 
