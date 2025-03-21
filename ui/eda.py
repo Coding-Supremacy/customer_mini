@@ -158,9 +158,9 @@ def run_eda():
         menu_title=None,
         options=[
             "📊 가입 연도 분석",
-            "💰 거래 금액 분석",
-            "🛒 구매 빈도 분석",
             "📈 고객 유형 분석",
+            "🛒 구매 빈도 분석",
+            "💰 거래 금액 분석",
             "🌎 지역별 구매 분석"
         ],
         icons=["calendar", "cash", "cart", "graph-up", "globe"],
