@@ -292,21 +292,21 @@ def run_eda():
         else:
             st.error(f"⚠️ CSV 파일이 존재하지 않습니다: {csv_path}")
             # 이메일 발송 버튼
-    # 이메일 발송 버튼
-    if st.button("프로모션 이메일 발송"):
-        for i, (cluster, avg_transaction) in enumerate(cluster_avg.items()):
-            if i < len(cluster_avg) // 3:  
-                message = "제휴 카드 사용 시 3% 할인 혜택을 제공합니다."
-            elif i < 2 * len(cluster_avg) // 3:  
-                message = "VIP 멤버십 혜택을 통해 추가 할인 및 서비스를 제공합니다."
-            else:  
-                message = "재구매 할인 쿠폰을 통해 구매를 촉진해 보세요."
-            cluster_df = df[df['Cluster'] == cluster]
-            for index, row in cluster_df.iterrows():
-                customer_name = row['이름']  # 고객 이름을 데이터프레임에서 가져옴
-                customer_email = row['이메일']
-                send_email(customer_name, customer_email, message)
-        st.success("이메일 발송이 완료되었습니다.")
+        # 이메일 발송 버튼
+        if st.button("프로모션 이메일 발송"):
+            for i, (cluster, avg_transaction) in enumerate(cluster_avg.items()):
+                if i < len(cluster_avg) // 3:  
+                    message = "제휴 카드 사용 시 3% 할인 혜택을 제공합니다."
+                elif i < 2 * len(cluster_avg) // 3:  
+                    message = "VIP 멤버십 혜택을 통해 추가 할인 및 서비스를 제공합니다."
+                else:  
+                    message = "재구매 할인 쿠폰을 통해 구매를 촉진해 보세요."
+                cluster_df = df[df['Cluster'] == cluster]
+                for index, row in cluster_df.iterrows():
+                    customer_name = row['이름']  # 고객 이름을 데이터프레임에서 가져옴
+                    customer_email = row['이메일']
+                    send_email(customer_name, customer_email, message)
+            st.success("이메일 발송이 완료되었습니다.")
 
     # 3) 구매 빈도 분석
     elif selected == "🛒 구매 빈도 분석":
