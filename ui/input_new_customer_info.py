@@ -502,6 +502,5 @@ def step3_customer_data_storage():
 
             print("✅ 이메일 전송 로그 저장 완료!")
             st.session_state["step"] = 1
-            st.success("회원 정보 저장이 완료되었습니다. 초기 화면으로 돌아갑니다.")
             time.sleep(2)
             st.rerun()
