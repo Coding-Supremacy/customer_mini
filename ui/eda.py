@@ -163,7 +163,7 @@ def run_eda():
             st.error(f"⚠️ CSV 파일이 존재하지 않습니다: {csv_path}")
 
     elif selected == "💰 거래 금액 분석":
-        st.subheader("💰 고객 세그먼트별 거래 금액")
+        st.subheader("💰 고객 유형별 거래 금액")
         st.markdown("""
         고객 유형별 거래 금액 분포를 박스플롯으로 시각화합니다. 
         중앙값, 사분위 범위 및 이상치를 통해 소비 패턴을 파악할 수 있습니다.
@@ -179,13 +179,13 @@ def run_eda():
                     df,
                     x="Cluster_Display",  # 새로운 열을 x축으로 사용
                     y="거래 금액",
-                    title="클러스터별 거래 금액 분포",
+                    title="고객 유형별 거래 금액 분포",
                     labels={'Cluster_Display': '고객 유형', '거래 금액': '거래 금액(원)'},
                     color="Cluster_Display",  # 각 클러스터별로 색상이 다르게 나타나도록 설정
                     color_discrete_sequence=px.colors.qualitative.Pastel[:8]  # 8개의 색상 사용
                 )
                 box_fig.update_layout(
-                    title={'text': '클러스터별 거래 금액 분포', 'x': 0.5, 'font': {'size': 20}},
+                    title={'text': '고객 유형별 거래 금액 분포', 'x': 0.5, 'font': {'size': 20}},
                     xaxis=dict(title='고객 유형', tickangle=-45),  # x축 레이블을 45도 기울여 정렬
                     yaxis=dict(title='거래 금액(원)'),
                     margin=dict(l=40, r=40, t=40, b=120),  # x축 레이블이 잘리지 않도록 여백을 늘림
