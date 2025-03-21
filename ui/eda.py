@@ -294,10 +294,9 @@ def run_eda():
                 st.error("필요한 컬럼('Cluster', '거래 금액')이 CSV 파일에 없습니다.")
         else:
             st.error(f"⚠️ CSV 파일이 존재하지 않습니다: {csv_path}")
-            # 이메일 발송 버튼
         
-        if st.button("프로모션 이메일 발송"):
-            st.success("이메일 발송이 완료되었습니다.")
+        
+    
                   
         
 
