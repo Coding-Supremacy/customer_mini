@@ -14,8 +14,8 @@ st.set_page_config(page_title="현대 자동차 고객관리 앱", layout="wide"
 
 
 def send_email(customer_name, customer_email, message):
-    EMAIL_ADDRESS = "dmdals1012@gmail.com"
-    EMAIL_PASSWORD = "izrk dbhv sokt zwxy" 
+    EMAIL_ADDRESS = "vhzkflfltm6@gmail.com"
+    EMAIL_PASSWORD = "cnvc dpea ldyv pfgq" 
     
     msg = MIMEMultipart()
     msg['From'] = EMAIL_ADDRESS
