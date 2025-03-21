@@ -5,8 +5,80 @@ import plotly.express as px
 import plotly.colors as pc
 from streamlit_option_menu import option_menu
 from streamlit_autorefresh import st_autorefresh
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
 
 st.set_page_config(page_title="현대 자동차 고객관리 앱", layout="wide")
+
+
+def send_email(customer_name, customer_email, message):
+    EMAIL_ADDRESS = "dmdals1012@gmail.com"
+    EMAIL_PASSWORD = "izrk dbhv sokt zwxy" 
+    
+    msg = MIMEMultipart()
+    msg['From'] = EMAIL_ADDRESS
+    msg['To'] = customer_email
+    msg['Subject'] = f"{customer_name}님, 프로모션 안내"
+
+    html_body = f"""
+    <html>
+    <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 30px;">
+        <table style="width: 100%; max-width: 800px; margin: auto; background: white; padding: 30px; 
+                    border-radius: 15px; box-shadow: 0px 5px 15px rgba(0,0,0,0.1);">
+            <!-- 헤더 영역 (로고) -->
+            <tr>
+                <td style="text-align: center; padding: 20px; background: #005bac; color: white; 
+                        border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                    <h1 style="margin: 0;">🚗 현대자동차 프로모션 🚗</h1>
+                </td>
+            </tr>
+            
+            <!-- 본문 내용 -->
+            <tr>
+                <td style="padding: 30px; text-align: center;">
+                    
+                    <!-- 현대 로고 -->
+                    <a href="https://www.hyundai.com" target="_blank">
+                    <img src="cid:hyundai_logo"
+                        alt="현대 로고" style="width: 100%; max-width: 500px; border-radius: 10px;">
+                    </a>
+
+                    <p style="font-size: 18px;">안녕하세요, <strong>{customer_name}</strong>님!</p>
+
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; font-size: 16px; margin-top: 20px;">
+                        {message}
+                    </div>
+                    
+                    <a href="https://www.hyundai.com" 
+                        style="display: inline-block; background: #005bac; color: white; padding: 15px 30px; 
+                            text-decoration: none; border-radius: 8px; margin-top: 20px; font-size: 16px;">
+                        지금 확인하기
+                    </a>
+                </td>
+            </tr>
+
+            <!-- 푸터 (고객센터 안내) -->
+            <tr>
+                <td style="padding: 15px; font-size: 14px; text-align: center; color: gray;">
+                    ※ 본 메일은 자동 발송되었으며, 문의는 고객센터를 이용해주세요.
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    """
+
+    msg.attach(MIMEText(html_body, 'html'))
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)  # Gmail SMTP 서버 사용
+    server.starttls()
+    server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+    text = msg.as_string()
+    server.sendmail(EMAIL_ADDRESS, customer_email, text)
+    server.quit()
+
 
 # 10초마다 자동 새로고침 (10000 밀리초)
 st_autorefresh(interval=10000, limit=None, key="fizzbuzz")
@@ -161,6 +233,7 @@ def run_eda():
                 st.error("필요한 컬럼('가입일', '고객 세그먼트')이 CSV 파일에 없습니다.")
         else:
             st.error(f"⚠️ CSV 파일이 존재하지 않습니다: {csv_path}")
+    
 
     elif selected == "💰 거래 금액 분석":
         st.subheader("💰 고객 유형별 거래 금액")
@@ -218,6 +291,22 @@ def run_eda():
                 st.error("필요한 컬럼('Cluster', '거래 금액')이 CSV 파일에 없습니다.")
         else:
             st.error(f"⚠️ CSV 파일이 존재하지 않습니다: {csv_path}")
+            # 이메일 발송 버튼
+    # 이메일 발송 버튼
+    if st.button("프로모션 이메일 발송"):
+        for i, (cluster, avg_transaction) in enumerate(cluster_avg.items()):
+            if i < len(cluster_avg) // 3:  
+                message = "제휴 카드 사용 시 3% 할인 혜택을 제공합니다."
+            elif i < 2 * len(cluster_avg) // 3:  
+                message = "VIP 멤버십 혜택을 통해 추가 할인 및 서비스를 제공합니다."
+            else:  
+                message = "재구매 할인 쿠폰을 통해 구매를 촉진해 보세요."
+            cluster_df = df[df['Cluster'] == cluster]
+            for index, row in cluster_df.iterrows():
+                customer_name = row['이름']  # 고객 이름을 데이터프레임에서 가져옴
+                customer_email = row['이메일']
+                send_email(customer_name, customer_email, message)
+        st.success("이메일 발송이 완료되었습니다.")
 
     # 3) 구매 빈도 분석
     elif selected == "🛒 구매 빈도 분석":
