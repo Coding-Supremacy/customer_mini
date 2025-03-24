@@ -232,21 +232,50 @@ launch_dates = {
 
     st.subheader("SVC 모델을 활용한 신규 고객 클러스터링 분류")
 
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image('img/sc3.png')
+    with col2:
+        st.markdown("""
+새 고객 데이터 입력 시, SVC 모델로 클러스터링 분류를 진행하였습니다.
+                """)
+    col1, col2 = st.columns(2)
+    with col1:
+        st.code("""
+# 새로운 고객 데이터 생성
+new_customer_data = {
+    "성별": ["남성"],
+    "차량구분": ["대형 세단"],
+    "거래 방식": ["현금"],
+    "제품 출시년월": ["2023-01"],
+    "제품 구매 날짜": ["2025-03-15"],
+    "고객 세그먼트": ["신규"],
+    "친환경차": ["부"],
+    "연령": [21],
+    "거래 금액": [90000000],
+    "제품 구매 빈도": [2]
+}""")
+    with col2:
+        st.image('img/sc4.png', use_container_width=True)
+
+    st.markdown("---")
+
+
     st.subheader("고객 세그먼트별 프로모션 이메일 발송")
     st.markdown("""
-분석 결과를 토대로 고객 클러스터링별 프로모션 이메일이 발송되도록 설정하였습니다.<br>
+분석 결과를 토대로 고객 클러스터링별 프로모션 이메일이 발송되도록 설정하였습니다.
 
 """)
     col1, col2 = st.columns(2)
     with col1:
         st.image('img/sc1.png', use_container_width=True)
         st.markdown("""
-0번 클러스터 프로모션 메일 예시
+      0번 클러스터 프로모션 메일 예시
 
 """)
     with col2:
         st.image('img/sc2.png', use_container_width=True)
         st.markdown("""
-1번 클러스터 프로모션 메일 예시
+      1번 클러스터 프로모션 메일 예시
         """)
         

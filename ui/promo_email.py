@@ -16,8 +16,8 @@ import schedule
 # SMTP 서버 설정
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
-EMAIL_ADDRESS = "qhrehlwl111@gmail.com"
-EMAIL_PASSWORD = "peyhgyaxtewzhfmi"  # 보안 강화를 위해 앱 비밀번호 사용
+EMAIL_ADDRESS = "dmdals1012@gmail.com"
+EMAIL_PASSWORD = "izrk dbhv sokt zwxy" 
 
 try:
     print("📢 SMTP 서버 연결 시도 중 (TLS)...")

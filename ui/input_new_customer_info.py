@@ -1,4 +1,5 @@
 import os
+import time
 import streamlit as st
 import pandas as pd
 import joblib
@@ -74,7 +75,7 @@ def run_input_step1():
     st.title('📋 고객 정보 입력')
 
     # 모델 로드
-    model = joblib.load("model/model4.pkl")
+    model = joblib.load("model/svm_model.pkl")
 
     st.info("""
             #### 고객 정보를 입력하고 예측 버튼을 눌러주세요.
@@ -503,3 +504,7 @@ def step3_customer_data_storage():
                 log_entry.to_csv(log_file_path, mode='a', header=False, index=False)  # 기존 파일에 추가
 
             print("✅ 이메일 전송 로그 저장 완료!")
+            st.session_state["step"] = 1
+            st.success("회원 정보 저장이 완료되었습니다. 초기 화면으로 돌아갑니다.")
+            time.sleep(2)
+            st.rerun()
