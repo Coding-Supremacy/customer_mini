@@ -53,7 +53,7 @@ def run_app():
     # 📌 CSS 적용하여 좌우 여백 추가 (최대 너비 조정)
     
 
-    menu = ['홈', '고객정보 입력', 'EDA', '개발 과정']
+    menu = ['홈', '고객정보 입력', '고객 분석', '개발 과정']
 
     with st.sidebar:
         selected = option_menu("메뉴", menu, 
@@ -68,7 +68,7 @@ def run_app():
     if selected == '고객정보 입력' :
         run_input_customer_info() 
     
-    if selected == 'EDA' :
+    if selected == '고객 분석' :
         run_eda()
      
     

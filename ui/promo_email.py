@@ -286,7 +286,7 @@ def send_scheduled_emails():
 
 
 # **📌 스케줄 설정 (매일 오전 9시 실행)**
-schedule.every(5).minutes.do(send_scheduled_emails)
+# schedule.every(5).minutes.do(send_scheduled_emails)
 
 # 📌 스케줄 실행 함수
 def schedule_worker():

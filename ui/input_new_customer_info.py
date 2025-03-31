@@ -330,10 +330,7 @@ def step2_vehicle_selection():
         }
     }
 
-    st.text(f"예측된 클러스터: {cluster_id}")
-    st.text("고객의 성향에 맞춘 추천차량 목록입니다.")
-    st.text(f"고객 유형: {customer_type}")
-    st.text(f"특징: {characteristics}")
+    st.info("고객님의 성향에 맞춘 추천차량 목록입니다.")
 
     # 고객이 선택한 구입 희망 모델
     구매한제품 = st.session_state.get("구매한제품", "")
@@ -412,7 +409,7 @@ def step3_customer_data_storage():
         가입일 = st.date_input("가입일")
 
         # 고객 정보 저장하기 버튼
-        submit_button = st.form_submit_button("고객정보 분석하기")
+        submit_button = st.form_submit_button("고객정보 저장하기")
 
         if submit_button:
             if not (이름 and 휴대폰번호 and 이메일 and 주소 and 아이디 and 가입일):
@@ -505,6 +502,5 @@ def step3_customer_data_storage():
 
             print("✅ 이메일 전송 로그 저장 완료!")
             st.session_state["step"] = 1
-            st.success("회원 정보 저장이 완료되었습니다. 초기 화면으로 돌아갑니다.")
             time.sleep(2)
             st.rerun()

@@ -4,12 +4,12 @@ def run_home():
     
     
 
-    st.markdown("<h1 style='text-align: center;'>🚗 고객 클러스터링 & 맞춤형 프로모션 시스템</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>🚗 차량 추천 & 맞춤형 프로모션 시스템</h1>", unsafe_allow_html=True)
 
     st.divider()
 
     # 📌 간단한 앱 소개
-    st.write("이 앱은 고객 데이터를 분석하여 클러스터링을 수행하고, 맞춤형 프로모션을 제공합니다.")
+    st.write("이 앱은 인공지능을 이용해 차량을 추천하고 고객 데이터를 분석하여 맞춤형 프로모션을 제공합니다.")
 
     
 
@@ -23,7 +23,7 @@ def run_home():
 
     with col2:
         st.write("#### 🤖  예측")
-        st.success("머신러닝 모델을 활용하여 고객 행동을 예측합니다.")
+        st.success("머신러닝 모델을 활용하여 고객 유형을 예측합니다.")
 
     with col3:
         st.write("#### ✉️ 프로모션 발송")

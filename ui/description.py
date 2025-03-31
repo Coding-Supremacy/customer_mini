@@ -74,12 +74,11 @@ launch_dates = {
         st.dataframe(df_ecoproduct,hide_index=True)
     st.markdown("""
 구매 모델 중 **FCEV, HEV, EV, PHEV 모델**은 친환경차로 분류하여 **친환경차를 선호하는 고객군**을 파악하고자 하였습니다.
-                
                     """)
 
     st.markdown("---")   
 
-    st.subheader('고객 세그먼트 수정 🙆')
+    st.subheader('RFM 고객 세그먼트 분석 및 수정 🙆')
     col1, col2 = st.columns(2)
 
     with col1:
@@ -123,8 +122,7 @@ launch_dates = {
 
     st.markdown("""
                 📌 구매빈도 횟수와 무관해보이는 세그먼트 구분<br>📌 일반, 신규 거래금액과 크게 차이가 없는 이탈가능 세그먼트의 거래금액 분포<br>
-                고객 세그먼트 기준을 모르는 개발팀 입장에서는 어떤 기준으로 VIP, 이탈가능으로 분류했는지 모호합니다. <br>
-                하지만 클라이언트 측 고객관리팀에서 **VIP, 이탈가능 세그먼트를 선정한 기준이 있을것으로 판단**하고 세그먼트를 유지하였습니다.  
+                이탈가능 고객에게 적극적인 마케팅을 할 경우 VIP 고객이 될 수 있다는 잠재적 가능성이 있다고 보여집니다. 
     """, unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
@@ -196,7 +194,7 @@ launch_dates = {
 
     st.subheader('전처리 후 고객정보 데이터셋 📊')
     df2['휴대폰번호'] = df2['휴대폰번호'].astype(str).apply(lambda x: '0' + x)
-    st.dataframe(df2.head())
+    st.dataframe(df2.head(),hide_index=True)
 
     st.markdown("---")
     st.title("KMeans 클러스터링 진행")
@@ -218,7 +216,7 @@ launch_dates = {
     세그먼트는 클라이언트의 전략적 판단에 따라 고객의 특성을 기반으로 나눈 값으로 보았습니다.<br>
                 클러스터링을 통해 고객을 더 세밀하게 분류한 후, 이를 기존 세그먼트와 결합하면, 비즈니스 전략에 더 유용한 인사이트를 제공할 수 있습니다.<br>
                 """, unsafe_allow_html=True)
-
+    
     col1, col2 = st.columns(2)
     with col1:
         st.image('img/elbow.png', use_container_width=200)
@@ -237,7 +235,7 @@ launch_dates = {
         st.image('img/sc3.png')
     with col2:
         st.markdown("""
-새 고객 데이터 입력 시, SVC 모델로 클러스터링 분류를 진행하였습니다.
+파이프라인을 구축하여 새 고객 데이터가 입력되면 카테고리컬 데이터는 인코딩, 수치형 데이터는 스케일링이 자동으로 수행과, SVC 모델을 통해 클러스터링 및 분류가 이루어지도록 설계하였습니다.
                 """)
     col1, col2 = st.columns(2)
     with col1:
